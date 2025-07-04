@@ -1,0 +1,9 @@
+{
+  "name": "raylib-level-editor",
+  "version": "0.1.0",
+  "license": "MIT",
+  "dependencies": [
+    "raylib",
+    "gtest"
+  ]
+}

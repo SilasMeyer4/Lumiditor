@@ -1,0 +1,52 @@
+# Build output
+out/
+build/
+
+# VSCode settings
+.vscode/
+
+# Qudo files (IDE-spezifisch oder Build?)
+.qodo/
+
+# vcpkg installed packages (normalerweise nicht im Repo)
+vcpkg_installed/
+installed/
+
+# CMake build files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.cmake
+*.log
+
+# Editor/IDE temporäre Dateien
+*.swp
+*.swo
+*.user
+*.userosscache
+*.sln
+*.vcxproj*
+*.opensdf
+*.sdf
+
+# Logs and databases
+*.log
+*.db
+
+# Backup files
+*~
+*.bak
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Others
+*.exe
+*.dll
+*.obj
+*.o
+*.lib
+*.pdb
+*.ilk
