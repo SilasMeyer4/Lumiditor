@@ -5,7 +5,7 @@
 #include "uiElement2D.h"
 #include <vector>
 
-namespace Lumiditor
+namespace LumidiGui
 {
   class UIManager
   {
@@ -23,7 +23,7 @@ namespace Lumiditor
     void AddElement(std::shared_ptr<UIElement2D> element);
 
     // Method to update all UI elements
-    void Update();
+    void Update(Vector2 mousePosition, bool mousePressed = false);
 
     // Method to draw all UI elements
     void Draw() const;

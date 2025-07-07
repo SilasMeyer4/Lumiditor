@@ -4,7 +4,7 @@
 #include "raylib.h"
 #include "uiElement2D.h"
 
-namespace Lumiditor
+namespace LumidiGui
 {
   class Label : public UIElement2D
   {

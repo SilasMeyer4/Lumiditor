@@ -6,20 +6,22 @@ find_package(GTest CONFIG REQUIRED)
 
 enable_testing()
 
+
+# Adding LumidiGui as a subdirectory
+add_subdirectory(lumidiGui)
+
+
+# Lumidieditor
 file(GLOB_RECURSE SRC_FILES "src/*.cpp")
-file(GLOB_RECURSE TEST_FILES "tests/*.cpp")
+
 add_executable(LUMIDITOR ${SRC_FILES})
-
-
 target_include_directories(LUMIDITOR PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_link_libraries(LUMIDITOR PRIVATE raylib lumidiGui)
 
-target_link_libraries(LUMIDITOR PRIVATE raylib)
+# Tests
 
-
-
-
+file(GLOB_RECURSE TEST_FILES "tests/*.cpp")
 add_executable(tests ${TEST_FILES})
-
 target_include_directories(tests PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(tests PRIVATE GTest::gtest GTest::gmock raylib)
 

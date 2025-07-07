@@ -1,6 +1,6 @@
 #include "UIManager.h"
 
-namespace Lumiditor
+namespace LumidiGui
 {
   void UIManager::AddElement(std::shared_ptr<UIElement2D> element)
   {
@@ -14,11 +14,11 @@ namespace Lumiditor
     this->elements.push_back(std::make_shared<T>(std::forward<Args>(args)...));
   }
 
-  void UIManager::Update()
+  void UIManager::Update(Vector2 mousePosition, bool mousePressed)
   {
     for (const auto &element : elements)
     {
-      element->Update();
+      element->Update(mousePosition, mousePressed);
     }
   }
 
@@ -51,9 +51,9 @@ namespace Lumiditor
 
   void UIManager::OnMouseDown(MouseButton button)
   {
-    if (this->focusedElement && this->focusedElement->onClick)
+    if (this->focusedElement)
     {
-      this->focusedElement->onClick(button);
+      focusedElement->Update(GetMousePosition(), true);
     }
   }
 }

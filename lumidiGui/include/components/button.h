@@ -6,7 +6,7 @@
 #include <string>
 #include <functional>
 
-namespace Lumiditor
+namespace LumidiGui
 {
   class Button : public UIElement2D
   {
@@ -16,7 +16,6 @@ namespace Lumiditor
     Button(Vector2 position, Vector2 size, std::string text = "Button");
     ~Button();
     void Draw() const override;
-    void Update() override;
 
     // Properties
     std::string text;               // Text displayed on the button

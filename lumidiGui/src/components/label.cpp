@@ -1,6 +1,6 @@
 #include "label.h"
 
-namespace Lumiditor
+namespace LumidiGui
 {
 
   Label::Label(/* args */)
