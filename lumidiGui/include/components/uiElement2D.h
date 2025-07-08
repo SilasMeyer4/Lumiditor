@@ -4,12 +4,14 @@
 #include "raylib.h"
 #include "uiCollider.h"
 #include "uiBehavior.h"
+#include "concepts.h"
 #include <functional>
 #include <memory>
 #include <string>
 
 namespace LumidiGui
 {
+
   class UIElement2D : public std::enable_shared_from_this<UIElement2D>
   {
   private:
@@ -19,12 +21,19 @@ namespace LumidiGui
   public:
     UIElement2D(std::string name, Vector2 position, Vector2 size);
     ~UIElement2D() = default;
+
+    template <DerivedFromUIElement2D T, typename... Args>
+    static std::shared_ptr<T> Create(Args &&...args)
+    {
+      return std::make_shared<T>(std::forward<Args>(args)...);
+    }
+
     virtual void Draw() const = 0;                                 // Function to draw the UI element, to be implemented in derived classes
     virtual void Update(Vector2 mousePosition, bool mousePressed); // Function to update the UI element, can be overridden in derived classes
     virtual void Render();
     void SetCollider(std::shared_ptr<UICollider> collider);
 
-    template <typename BehaviorType, typename... Args>
+    template <DerivedFromUIBehavior BehaviorType, typename... Args>
     void AddBehavior(Args &&...args)
     {
       behaviors_.push_back(std::make_shared<BehaviorType>(std::forward<Args>(args)...));
@@ -40,7 +49,7 @@ namespace LumidiGui
     bool RemoveChild(std::shared_ptr<UIElement2D> child);
     bool RemoveChild(const std::string &name);
 
-    template <typename... Children>
+    template <StringLikeOrSharedPointerType... Children>
     bool RemoveChildren(Children &&...children)
     {
       return (RemoveChild(std::forward<Children>(children)) && ...);
@@ -50,25 +59,13 @@ namespace LumidiGui
 
     bool AddChild(std::shared_ptr<UIElement2D> child);
 
-    template <typename... Children>
+    template <SharedPointerType... Children>
     bool AddChildren(Children &&...children)
     {
       return (AddChild(std::forward<Children>(children)) && ...);
     }
 
     void ClearAllChildren();
-
-    /**
-     * Adds multiple UI elements to the UIManager.
-     * @param first The first UIElement2D to be added.
-     * @param rest The remaining UIElement2D elements to be added.
-     */
-    template <typename... Elements>
-    void AddElement(std::shared_ptr<UIElement2D> first, Elements... rest)
-    {
-      AddElement(first);
-      (AddElement(rest), ...);
-    }
 
     std::weak_ptr<UIElement2D> parent;
 

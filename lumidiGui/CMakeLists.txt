@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(LumidiGui)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Bibliothek bauen
@@ -13,6 +13,7 @@ target_include_directories(lumidiGui PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/components
     ${CMAKE_CURRENT_SOURCE_DIR}/include/colliders
     ${CMAKE_CURRENT_SOURCE_DIR}/include/events
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/helpers
 )
 
 # raylib binden
@@ -31,6 +32,7 @@ if(BUILD_TESTS)
     FetchContent_Declare(
         googletest
         URL https://github.com/google/googletest/releases/download/v1.17.0/googletest-1.17.0.tar.gz
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     )
     FetchContent_MakeAvailable(googletest)
 

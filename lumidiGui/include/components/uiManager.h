@@ -3,10 +3,12 @@
 
 #include <memory>
 #include "uiElement2D.h"
+#include "concepts.h"
 #include <vector>
 
 namespace LumidiGui
 {
+
   /**
    * @brief Manages a collection of 2D UI elements.
    *
@@ -44,7 +46,7 @@ namespace LumidiGui
      * @param elements Elements to add.
      * @return true if all elements were added successfully, false otherwise.
      */
-    template <typename... Elements>
+    template <SharedPointerType... Elements>
     bool AddElements(Elements &&...elements)
     {
       return (AddElement(std::forward<Elements>(elements)) && ...);
@@ -75,6 +77,8 @@ namespace LumidiGui
      */
     bool RemoveElement(const std::string &name);
 
+    bool RemoveElement(std::shared_ptr<UIElement2D> element);
+
     /**
      * @brief Removes multiple UI elements from the manager.
      *
@@ -82,9 +86,7 @@ namespace LumidiGui
      * @param elements Elements to remove.
      * @return true if all elements were removed successfully, false otherwise.
      */
-    bool RemoveElement(std::shared_ptr<UIElement2D> element);
-
-    template <typename... Elements>
+    template <StringLikeOrSharedPointerType... Elements>
     bool RemoveElements(Elements &&...elements)
     {
       return (RemoveElement(std::forward<Elements>(elements)) && ...);
@@ -95,6 +97,7 @@ namespace LumidiGui
      */
     void Draw() const;
   };
+
 }
 
 #endif // LUMIDITOR_UIMANAGER_H

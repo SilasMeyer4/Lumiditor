@@ -19,10 +19,6 @@ namespace LumidiGui
 
     // Properties
     std::string text;               // Text displayed on the button
-    bool isHovered = false;         // Flag to check if the button is hovered
-    bool isPressed = false;         // Flag to check if the button is pressed
-    bool isEnabled = false;         // Flag to check if the button is enabled
-    bool isVisible = true;          // Flag to check if the button is visible
     Color color = LIGHTGRAY;        // Color of the button
     Color hoverColor = DARKGRAY;    // Color when hovered
     Color pressedColor = GRAY;      // Color when pressed
