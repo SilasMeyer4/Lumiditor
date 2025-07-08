@@ -9,7 +9,7 @@ int main(int, char **)
     InitWindow(800, 600, "Lumiditor Level Editor");
     SetTargetFPS(60);
 
-    auto button = std::make_shared<LumidiGui::Button>(Vector2{350, 300}, Vector2{100, 50}, "Click Me");
+    auto button = std::make_shared<LumidiGui::Button>("Button1", Vector2{350, 300}, Vector2{100, 50}, "Click Me");
     LumidiGui::UIManager uiManager;
 
     button->AddBehavior<LumidiGui::Events::ClickBehavior>(

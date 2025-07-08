@@ -1,17 +1,16 @@
 #include "UIManager.h"
+#include <iostream>
 
 namespace LumidiGui
 {
-  void UIManager::AddElement(std::shared_ptr<UIElement2D> element)
+  std::shared_ptr<UIElement2D> UIManager::GetElementByName(const std::string &name) const
   {
-    elements.push_back(element);
-  }
-
-  template <typename T, typename... Args>
-  void UIManager::AddElement(Args &&...args)
-  {
-    static_assert(std::is_base_of<UIElement2D, T>::value, "T must derive from UIElement2D");
-    this->elements.push_back(std::make_shared<T>(std::forward<Args>(args)...));
+    auto it = elementMap.find(name);
+    if (it != elementMap.end())
+    {
+      return it->second;
+    }
+    return nullptr; // Return nullptr if the element is not found
   }
 
   void UIManager::Update(Vector2 mousePosition, bool mousePressed)
@@ -22,38 +21,46 @@ namespace LumidiGui
     }
   }
 
+  bool UIManager::RemoveElement(const std::string &name)
+  {
+    auto element = GetElementByName(name);
+    if (element)
+    {
+      return RemoveElement(element);
+    }
+    return false; // Return false if the element was not found
+  }
+
+  bool UIManager::RemoveElement(std::shared_ptr<UIElement2D> element)
+  {
+    auto it = std::remove(elements.begin(), elements.end(), element);
+    if (it != elements.end())
+    {
+      elements.erase(it, elements.end());
+      elementMap.erase(element->name);
+      return true; // Element was successfully removed
+    }
+    return false; // Element was not found
+  }
+
+  bool UIManager::AddElement(std::shared_ptr<UIElement2D> element)
+  {
+    if (!allowDuplicateNames && elementMap.find(element->name) != elementMap.end())
+    {
+      std::cerr << "[UIManager] Error: Element with name '" << element->name << "' already exists." << std::endl;
+      return false;
+    }
+
+    elements.push_back(element);
+    this->elementMap[element->name] = element;
+    return true;
+  }
+
   void UIManager::Draw() const
   {
     for (const auto &element : elements)
     {
       element->Draw();
-    }
-  }
-  void UIManager::OnMouseMove(Vector2 position)
-  {
-    std::shared_ptr<UIElement2D> newFocusedElement = nullptr;
-
-    for (auto iterator = elements.rbegin(); iterator != elements.rend(); iterator++)
-    {
-      if ((*iterator)->ContainsPoint(position))
-      {
-        newFocusedElement = *iterator;
-        break; // Stop at the first element that contains the point
-      }
-    }
-
-    if (newFocusedElement != this->focusedElement)
-    {
-      // If the focused element has changed, update the focused element
-      this->focusedElement = newFocusedElement;
-    }
-  }
-
-  void UIManager::OnMouseDown(MouseButton button)
-  {
-    if (this->focusedElement)
-    {
-      focusedElement->Update(GetMousePosition(), true);
     }
   }
 }

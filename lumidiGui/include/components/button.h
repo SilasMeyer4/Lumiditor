@@ -13,7 +13,7 @@ namespace LumidiGui
   private:
     /* data */
   public:
-    Button(Vector2 position, Vector2 size, std::string text = "Button");
+    Button(std::string name, Vector2 position, Vector2 size, std::string text = "Button");
     ~Button();
     void Draw() const override;
 

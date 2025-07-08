@@ -11,7 +11,8 @@ namespace LumidiGui
   private:
     /* data */
   public:
-    Label(/* args */);
+    Label(std::string name, Vector2 position, Vector2 size, std::string text)
+        : UIElement2D(name, position, size) {}
     ~Label();
   };
 }

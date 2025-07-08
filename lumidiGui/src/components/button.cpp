@@ -4,8 +4,8 @@
 namespace LumidiGui
 {
 
-  Button::Button(Vector2 position, Vector2 size, std::string text)
-      : UIElement2D(position, size), text(text) // Call the base class constructor
+  Button::Button(std::string name, Vector2 position, Vector2 size, std::string text)
+      : UIElement2D(name, position, size), text(text) // Call the base class constructor
   {
     this->SetCollider(std::make_shared<RectangleCollider>(position, size));
   }

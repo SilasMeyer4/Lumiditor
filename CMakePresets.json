@@ -10,7 +10,8 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_TOOLCHAIN_FILE": "C:\\Users\\meyer\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+        "VCPKG_TARGET_TRIPLET": "x64-windows"
       }
     }
   ]

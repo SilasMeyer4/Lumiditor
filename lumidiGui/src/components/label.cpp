@@ -3,10 +3,6 @@
 namespace LumidiGui
 {
 
-  Label::Label(/* args */)
-  {
-  }
-
   Label::~Label()
   {
   }
