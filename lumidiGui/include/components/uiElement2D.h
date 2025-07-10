@@ -18,33 +18,46 @@ namespace LumidiGui
     std::shared_ptr<UICollider> collider_;                       // collider UI elements
     std::vector<std::shared_ptr<Events::UIBehavior>> behaviors_; // behaviors for UI elements
     std::vector<std::shared_ptr<UIElement2D>> children_;         // Children UI elements
+
+  protected:
+    void DrawChildren() const;
+
   public:
     UIElement2D(std::string name, Vector2 position, Vector2 size);
     ~UIElement2D() = default;
 
-    template <DerivedFromUIElement2D T, typename... Args>
-    static std::shared_ptr<T> Create(Args &&...args)
-    {
-      return std::make_shared<T>(std::forward<Args>(args)...);
-    }
-
-    virtual void Draw() const = 0;                                 // Function to draw the UI element, to be implemented in derived classes
+    virtual void Draw() const; // Function to draw the UI element, can be overriden in derived classes
+    std::weak_ptr<UIElement2D> parent;
     virtual void Update(Vector2 mousePosition, bool mousePressed); // Function to update the UI element, can be overridden in derived classes
     virtual void Render();
     void SetCollider(std::shared_ptr<UICollider> collider);
+    std::shared_ptr<UICollider> GetCollider() const;
 
     template <DerivedFromUIBehavior BehaviorType, typename... Args>
     void AddBehavior(Args &&...args)
     {
-      behaviors_.push_back(std::make_shared<BehaviorType>(std::forward<Args>(args)...));
+
+      behaviors_.push_back(std::make_unique<BehaviorType>(weak_from_this(), std::forward<Args>(args)...));
     }
 
     bool ContainsPoint(Vector2 point) const;
 
-    std::shared_ptr<UICollider> GetCollider() const;
     std::shared_ptr<UIElement2D> GetSharedPtr();
     std::vector<std::shared_ptr<UIElement2D>> GetChildren() const;
     std::vector<std::shared_ptr<Events::UIBehavior>> GetBehaviors() const;
+
+    template <DerivedFromUIBehavior BehaviorType>
+    std::shared_ptr<BehaviorType> GetBehavior() const
+    {
+      for (const auto &behavior : behaviors_)
+      {
+        if (auto specificBehavior = std::dynamic_pointer_cast<BehaviorType>(behavior))
+        {
+          return specificBehavior;
+        }
+      }
+      return nullptr; // Return nullptr if no behavior of the specified type is found
+    }
 
     bool RemoveChild(std::shared_ptr<UIElement2D> child);
     bool RemoveChild(const std::string &name);
@@ -55,8 +68,6 @@ namespace LumidiGui
       return (RemoveChild(std::forward<Children>(children)) && ...);
     }
 
-    std::shared_ptr<UIElement2D> GetChildByName(const std::string &name) const;
-
     bool AddChild(std::shared_ptr<UIElement2D> child);
 
     template <SharedPointerType... Children>
@@ -65,9 +76,9 @@ namespace LumidiGui
       return (AddChild(std::forward<Children>(children)) && ...);
     }
 
-    void ClearAllChildren();
+    std::shared_ptr<UIElement2D> GetChildByName(const std::string &name) const;
 
-    std::weak_ptr<UIElement2D> parent;
+    void ClearAllChildren();
 
     Vector2 position;      // Position of the UI element
     Vector2 size;          // Size of the UI element

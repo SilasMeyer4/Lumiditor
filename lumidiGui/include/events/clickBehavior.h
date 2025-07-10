@@ -14,12 +14,12 @@ namespace LumidiGui
     class ClickBehavior : public UIBehavior
     {
     private:
-      std::weak_ptr<UIElement2D> parent_;
       std::function<void()> onClick_;
+      bool isClicked_ = false; // Track if the button was clicked
 
     public:
-      ClickBehavior(std::shared_ptr<UIElement2D> parent, std::function<void()> onClick)
-          : parent_(parent), onClick_(std::move(onClick)) {}
+      ClickBehavior(std::weak_ptr<UIElement2D> parent, std::function<void()> onClick)
+          : UIBehavior(parent), onClick_(std::move(onClick)) {}
 
       void Update(Vector2 mousePosition, bool mousePressed) override;
     };

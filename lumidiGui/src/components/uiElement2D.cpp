@@ -2,6 +2,17 @@
 
 namespace LumidiGui
 {
+  void UIElement2D::DrawChildren() const
+  {
+    for (const auto &child : children_)
+    {
+      if (child->isVisible)
+      {
+        child->Draw();
+      }
+    }
+  }
+
   UIElement2D::UIElement2D(std::string name, Vector2 position, Vector2 size) : name(name), position(position), size(size)
   {
   }
@@ -10,7 +21,18 @@ namespace LumidiGui
   {
     for (auto &behavior : behaviors_)
     {
-      behavior->Update(mousePosition, mousePressed);
+      if (behavior->isEnabled)
+      {
+        behavior->Update(mousePosition, mousePressed);
+      }
+    }
+
+    for (auto &child : children_)
+    {
+      if (child->isEnabled)
+      {
+        child->Update(mousePosition, mousePressed);
+      }
     }
   }
 
@@ -18,7 +40,18 @@ namespace LumidiGui
   {
     for (auto &behavior : behaviors_)
     {
-      behavior->Render();
+      if (behavior->isEnabled)
+      {
+        behavior->Render();
+      }
+    }
+
+    for (auto &child : children_)
+    {
+      if (child->isEnabled)
+      {
+        child->Render();
+      }
     }
   }
   void UIElement2D::SetCollider(std::shared_ptr<UICollider> collider)
@@ -51,12 +84,18 @@ namespace LumidiGui
     return behaviors_;
   }
 
+  void UIElement2D::Draw() const
+  {
+    DrawChildren();
+  }
+
   bool UIElement2D::RemoveChild(std::shared_ptr<UIElement2D> child)
   {
     auto it = std::remove(children_.begin(), children_.end(), child);
     if (it != children_.end())
     {
       children_.erase(it, children_.end());
+      child->parent.reset();
       return true;
     }
     return false;
@@ -86,11 +125,31 @@ namespace LumidiGui
 
   bool UIElement2D::AddChild(std::shared_ptr<UIElement2D> child)
   {
+    if (!child)
+    {
+      return false;
+    }
+
+    if (auto existingParent = child->parent.lock())
+    {
+      if (existingParent.get() == this)
+      {
+        return false; // Child already has this element as a parent
+      }
+
+      existingParent->RemoveChild(child); // Remove from previous parent
+    }
+
+    child->parent = weak_from_this(); // Set this element as the new parent
     children_.push_back(child);
     return true;
   }
   void UIElement2D::ClearAllChildren()
   {
+    for (auto &child : children_)
+    {
+      child->parent.reset(); // Clear the parent reference for each child
+    }
     children_.clear();
   }
 }

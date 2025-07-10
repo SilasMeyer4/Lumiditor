@@ -19,6 +19,7 @@ namespace LumidiGui
     DrawRectangleV(position, size, LIGHTGRAY);
     // Draw the button text
     DrawText(text.c_str(), position.x + 10, position.y + 10, 20, BLACK);
+    DrawChildren(); // Draw any child elements
   }
 
 }

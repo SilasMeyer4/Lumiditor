@@ -9,31 +9,31 @@ int main(int, char **)
     InitWindow(800, 600, "Lumiditor Level Editor");
     SetTargetFPS(60);
 
-    auto button = std::make_shared<LumidiGui::Button>("Button2", Vector2{350, 300}, Vector2{100, 50}, "Click Me");
     LumidiGui::UIManager uiManager;
-
-    auto buttonCrreate = LumidiGui::UIElement2D::Create<LumidiGui::Button>("Button1", Vector2{350, 400}, Vector2{100, 50}, "Click Me");
-
-    button->AddBehavior<LumidiGui::Events::ClickBehavior>(
-        button, [button]()
+    uiManager.Create<LumidiGui::Button>("su", Vector2{350, 400}, Vector2{100, 50}, "Click Me");
+    uiManager.GetElementByName("su").lock()->AddBehavior<LumidiGui::Events::ClickBehavior>(
+        []()
         { std::cout << "Button clicked!" << std::endl; });
 
-    auto button1 = std::make_shared<LumidiGui::Button>("Button2", Vector2{350, 400}, Vector2{100, 50}, "Click Me Too");
+    uiManager.CreateChild<LumidiGui::Button>("siii", "su", Vector2{350, 300}, Vector2{100, 50}, "Child Button siii");
 
-    uiManager.AddElements(button, buttonCrreate);
+    uiManager.CreateChild<LumidiGui::Button>("slll", "su", Vector2{350, 200}, Vector2{100, 50}, "Child Button seee");
 
-    auto hallo = 4;
-    uiManager.RemoveElements("su");
+    uiManager.GetElementByName("siii").lock()->AddBehavior<LumidiGui::Events::ClickBehavior>(
+        []()
+        { std::cout << "Button clicked wiwuw!" << std::endl; });
+
+    uiManager.MoveChildToParent("siii", "slll");
+
+    uiManager.RemoveElement("siii");
 
     while (!WindowShouldClose())
     {
-
         uiManager.Update(GetMousePosition(), IsMouseButtonPressed(MOUSE_LEFT_BUTTON));
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        DrawText("Welcome to Lumiditor, a Raylib based Level Editor", 190, 200, 20, DARKGRAY);
         DrawFPS(10, 10);
 
         uiManager.Draw();
