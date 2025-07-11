@@ -8,65 +8,65 @@
 class MockUIElement2D : public LumidiGui::UIElement2D
 {
 public:
-  // Konstruktor ruft den Basisklassen-Konstruktor mit Standard-Position und -Größe auf
   MockUIElement2D(const std::string &n, Vector2 pos = {0, 0}, Vector2 size = {0, 0})
-      : LumidiGui::UIElement2D(n, pos, size) {}
+      : UIElement2D(n, pos, size) {}
 
-  // Draw() ist const in der Basisklasse
   MOCK_METHOD(void, Draw, (), (const, override));
-
-  // Update() mit Parametern Vector2 und bool
   MOCK_METHOD(void, Update, (Vector2, bool), (override));
 };
 
-using ::testing::_;
-using ::testing::NiceMock;
+using namespace LumidiGui;
+using ::testing::_;        // Matcher für beliebige Argumente
+using ::testing::NiceMock; // Für "ruhige" Mocks ohne Warnungen
 
 class UIManagerTest : public ::testing::Test
 {
 protected:
-  LumidiGui::UIManager manager;
+  UIManager manager;
 };
 
-TEST_F(UIManagerTest, AddUniqueElement_Succeeds)
+class DerivedMockElement : public MockUIElement2D
 {
-  auto element = std::make_shared<NiceMock<MockUIElement2D>>("unique");
-  bool result = manager.AddElement(element);
-  EXPECT_TRUE(result);
+public:
+  using MockUIElement2D::MockUIElement2D;
+};
 
-  auto retrieved = manager.GetElementByName("unique");
-  EXPECT_EQ(retrieved, element);
+TEST_F(UIManagerTest, CreateUniqueElement_Succeeds)
+{
+  auto elementWeak = manager.Create<DerivedMockElement>("unique");
+  ASSERT_FALSE(elementWeak.expired());
+
+  auto element = elementWeak.lock();
+  ASSERT_NE(element, nullptr);
+  EXPECT_EQ(element->name, "unique");
+
+  auto foundWeak = manager.GetElementByName("unique");
+  auto found = foundWeak.lock();
+  ASSERT_NE(found, nullptr);
+  EXPECT_EQ(found, element);
 }
 
-TEST_F(UIManagerTest, GetElementByName_ReturnsCorrectElement)
+TEST_F(UIManagerTest, CreateDuplicateElementName_FailsWhenNotAllowed)
 {
-  auto element = std::make_shared<NiceMock<MockUIElement2D>>("findme");
-  manager.AddElement(element);
+  manager.allowDuplicateNames = false;
 
-  auto found = manager.GetElementByName("findme");
-  EXPECT_EQ(found, element);
+  auto e1Weak = manager.Create<DerivedMockElement>("dup");
+  ASSERT_FALSE(e1Weak.expired());
+
+  auto e2Weak = manager.Create<DerivedMockElement>("dup");
+  EXPECT_TRUE(e2Weak.expired());
 }
 
 TEST_F(UIManagerTest, RemoveElementByName_ElementIsRemoved)
 {
-  auto element = std::make_shared<NiceMock<MockUIElement2D>>("toremove");
-  manager.AddElement(element);
+  auto elementWeak = manager.Create<DerivedMockElement>("toremove");
+  ASSERT_FALSE(elementWeak.expired());
 
   bool removed = manager.RemoveElement("toremove");
   EXPECT_TRUE(removed);
 
-  auto found = manager.GetElementByName("toremove");
-  EXPECT_EQ(found, nullptr);
-}
-
-TEST_F(UIManagerTest, AddDuplicateElementName_FailsWhenNotAllowed)
-{
-  auto element1 = std::make_shared<NiceMock<MockUIElement2D>>("dup");
-  auto element2 = std::make_shared<NiceMock<MockUIElement2D>>("dup");
-  manager.allowDuplicateNames = false;
-
-  EXPECT_TRUE(manager.AddElement(element1));
-  EXPECT_FALSE(manager.AddElement(element2));
+  auto foundWeak = manager.GetElementByName("toremove");
+  EXPECT_TRUE(foundWeak.expired());
 }
 
 TEST_F(UIManagerTest, RemoveNonExistentElementByName_ReturnsFalse)
@@ -75,29 +75,94 @@ TEST_F(UIManagerTest, RemoveNonExistentElementByName_ReturnsFalse)
   EXPECT_FALSE(removed);
 }
 
-TEST_F(UIManagerTest, GetElementByName_ReturnsNullptrIfNotFound)
+TEST_F(UIManagerTest, GetElementByName_ReturnsNullIfNotFound)
 {
-  auto found = manager.GetElementByName("missing");
-  EXPECT_EQ(found, nullptr);
+  auto elementWeak = manager.GetElementByName("missing");
+  EXPECT_TRUE(elementWeak.expired());
 }
 
-TEST_F(UIManagerTest, AddElements_MultipleUniqueElementsAdded)
+TEST_F(UIManagerTest, CreateChild_AttachesToParentCorrectly)
 {
-  auto e1 = std::make_shared<NiceMock<MockUIElement2D>>("a");
-  auto e2 = std::make_shared<NiceMock<MockUIElement2D>>("b");
-  auto e3 = std::make_shared<NiceMock<MockUIElement2D>>("c");
+  auto parentWeak = manager.Create<DerivedMockElement>("parent");
+  ASSERT_FALSE(parentWeak.expired());
+  auto parent = parentWeak.lock();
 
-  bool result = manager.AddElements(e1, e2, e3);
-  EXPECT_TRUE(result);
-
-  EXPECT_EQ(manager.GetElementByName("a"), e1);
-  EXPECT_EQ(manager.GetElementByName("b"), e2);
-  EXPECT_EQ(manager.GetElementByName("c"), e3);
+  auto childWeak = manager.CreateChild<DerivedMockElement>("child", "parent");
+  ASSERT_FALSE(childWeak.expired());
+  auto child = childWeak.lock();
+  auto children = parent->GetChildren();
+  // parent->children ist vector<shared_ptr<UIElement2D>>
+  ASSERT_EQ(children.size(), 1);
+  EXPECT_EQ(children[0], child);
 }
 
-TEST_F(UIManagerTest, RemoveElementByPointer_ElementNotManaged_ReturnsFalse)
+TEST_F(UIManagerTest, CreateChild_WithMissingParentFails)
 {
-  auto notManaged = std::make_shared<NiceMock<MockUIElement2D>>("notmanaged");
-  bool removed = manager.RemoveElement(notManaged);
-  EXPECT_FALSE(removed);
+  auto childWeak = manager.CreateChild<DerivedMockElement>("child", "nonexistent");
+  EXPECT_TRUE(childWeak.expired());
+}
+
+TEST_F(UIManagerTest, MoveChildToAnotherParent_Succeeds)
+{
+  auto parent1Weak = manager.Create<DerivedMockElement>("parent1");
+  auto parent2Weak = manager.Create<DerivedMockElement>("parent2");
+  ASSERT_FALSE(parent1Weak.expired());
+  ASSERT_FALSE(parent2Weak.expired());
+  auto parent1 = parent1Weak.lock();
+  auto parent2 = parent2Weak.lock();
+
+  auto childWeak = manager.CreateChild<DerivedMockElement>("child", "parent1");
+  ASSERT_FALSE(childWeak.expired());
+  auto child = childWeak.lock();
+
+  bool moved = manager.MoveChildToParent("child", "parent2");
+  EXPECT_TRUE(moved);
+  auto children1 = parent1->GetChildren();
+  auto children2 = parent2->GetChildren();
+  // Check child is removed from parent1 and added to parent2
+  EXPECT_EQ(children1.size(), 0);
+  ASSERT_EQ(children2.size(), 1);
+  EXPECT_EQ(children2[0]->name, "child");
+}
+
+TEST_F(UIManagerTest, MoveChildToMissingParent_Fails)
+{
+  auto parent1Weak = manager.Create<DerivedMockElement>("parent1");
+  ASSERT_FALSE(parent1Weak.expired());
+
+  auto childWeak = manager.CreateChild<DerivedMockElement>("child", "parent1");
+  ASSERT_FALSE(childWeak.expired());
+
+  bool moved = manager.MoveChildToParent("child", "nonexistent");
+  EXPECT_FALSE(moved);
+}
+
+TEST_F(UIManagerTest, Update_CallsUpdateOnEnabledElements)
+{
+  auto elementWeak = manager.Create<DerivedMockElement>("mock");
+  ASSERT_FALSE(elementWeak.expired());
+
+  auto element = elementWeak.lock();
+  // Aktivieren (Standard ist true, aber sicherheitshalber)
+  element->isEnabled = true;
+
+  // Downcast zu Mock für EXPECT_CALL
+  auto mockPtr = static_cast<MockUIElement2D *>(element.get());
+  EXPECT_CALL(*mockPtr, Update(_, _)).Times(1);
+
+  manager.Update({10, 10}, true);
+}
+
+TEST_F(UIManagerTest, Draw_CallsDrawOnVisibleElements)
+{
+  auto elementWeak = manager.Create<DerivedMockElement>("mock");
+  ASSERT_FALSE(elementWeak.expired());
+
+  auto element = elementWeak.lock();
+  element->isVisible = true;
+
+  auto mockPtr = static_cast<MockUIElement2D *>(element.get());
+  EXPECT_CALL(*mockPtr, Draw()).Times(1);
+
+  manager.Draw();
 }

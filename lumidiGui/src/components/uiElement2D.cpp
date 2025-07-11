@@ -17,13 +17,13 @@ namespace LumidiGui
   {
   }
 
-  void UIElement2D::Update(Vector2 mousePosition, bool mousePressed)
+  void UIElement2D::Update(InputManager &inputManager)
   {
     for (auto &behavior : behaviors_)
     {
       if (behavior->isEnabled)
       {
-        behavior->Update(mousePosition, mousePressed);
+        behavior->Update(inputManager);
       }
     }
 
@@ -31,7 +31,7 @@ namespace LumidiGui
     {
       if (child->isEnabled)
       {
-        child->Update(mousePosition, mousePressed);
+        child->Update(inputManager);
       }
     }
   }
@@ -54,17 +54,13 @@ namespace LumidiGui
       }
     }
   }
-  void UIElement2D::SetCollider(std::shared_ptr<UICollider> collider)
-  {
-    collider_ = std::move(collider);
-  }
 
   bool UIElement2D::ContainsPoint(Vector2 point) const
   {
     return collider_ ? collider_->Contains(point) : false;
   }
 
-  std::shared_ptr<UICollider> UIElement2D::GetCollider() const
+  std::shared_ptr<UICollider2D> UIElement2D::GetCollider() const
   {
     return collider_;
   }

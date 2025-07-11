@@ -5,6 +5,7 @@
 #include "uiCollider.h"
 #include "uiBehavior.h"
 #include "concepts.h"
+#include "inputManager.h"
 #include <functional>
 #include <memory>
 #include <string>
@@ -15,7 +16,7 @@ namespace LumidiGui
   class UIElement2D : public std::enable_shared_from_this<UIElement2D>
   {
   private:
-    std::shared_ptr<UICollider> collider_;                       // collider UI elements
+    std::shared_ptr<UICollider2D> collider_;                     // collider UI elements
     std::vector<std::shared_ptr<Events::UIBehavior>> behaviors_; // behaviors for UI elements
     std::vector<std::shared_ptr<UIElement2D>> children_;         // Children UI elements
 
@@ -28,15 +29,27 @@ namespace LumidiGui
 
     virtual void Draw() const; // Function to draw the UI element, can be overriden in derived classes
     std::weak_ptr<UIElement2D> parent;
-    virtual void Update(Vector2 mousePosition, bool mousePressed); // Function to update the UI element, can be overridden in derived classes
+    virtual void Update(InputManager &inputManager); // Function to update the UI element, can be overridden in derived classes
     virtual void Render();
-    void SetCollider(std::shared_ptr<UICollider> collider);
-    std::shared_ptr<UICollider> GetCollider() const;
+
+    template <DerivedFromUICollider2D Collider2DType, typename... Args>
+    void SetCollider(Args &&...args)
+    {
+      if constexpr (sizeof...(Args) == 0)
+      {
+        collider_ = std::make_shared<Collider2DType>(this->position, this->size);
+      }
+      else
+      {
+        collider_ = std::make_shared<Collider2DType>(std::forward<Args>(args)...);
+      }
+    }
+
+    std::shared_ptr<UICollider2D> GetCollider() const;
 
     template <DerivedFromUIBehavior BehaviorType, typename... Args>
     void AddBehavior(Args &&...args)
     {
-
       behaviors_.push_back(std::make_unique<BehaviorType>(weak_from_this(), std::forward<Args>(args)...));
     }
 

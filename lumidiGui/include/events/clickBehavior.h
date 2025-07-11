@@ -21,7 +21,7 @@ namespace LumidiGui
       ClickBehavior(std::weak_ptr<UIElement2D> parent, std::function<void()> onClick)
           : UIBehavior(parent), onClick_(std::move(onClick)) {}
 
-      void Update(Vector2 mousePosition, bool mousePressed) override;
+      void Update(InputManager &inputManager) override;
     };
   }
 }

@@ -4,13 +4,14 @@
 namespace LumidiGui
 {
 
-  void UIManager::Update(Vector2 mousePosition, bool mousePressed)
+  void UIManager::Update(InputManager &inputManager)
   {
+
     for (const auto &element : elements)
     {
       if (element->isEnabled)
       {
-        element->Update(mousePosition, mousePressed);
+        element->Update(inputManager);
       }
     }
   }

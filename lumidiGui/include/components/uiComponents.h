@@ -7,5 +7,7 @@
 #include "uiElement2D.h"
 #include "uiManager.h"
 #include "panel.h"
+#include "label.h"
+#include "rectangle.h"
 
 #endif // LUMIDI_GUI_COMPONENTS_H

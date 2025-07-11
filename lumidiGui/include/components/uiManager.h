@@ -6,6 +6,7 @@
 #include "concepts.h"
 #include <vector>
 #include <iostream>
+#include "inputManager.h"
 
 namespace LumidiGui
 {
@@ -81,13 +82,34 @@ namespace LumidiGui
      */
     std::weak_ptr<UIElement2D> GetElementByName(const std::string &name) const;
 
+    template <DerivedFromUIElement2D T>
+    std::weak_ptr<T> GetElementByNameAs(const std::string &name) const
+    {
+      auto it = elementMap.find(name);
+
+      if (it == elementMap.end())
+      {
+        std::cerr << "[UIManager] Element with name '" << name << "' not found!" << std::endl;
+        return std::weak_ptr<T>{}; // empty weakpointer
+      }
+
+      auto casted = std::dynamic_pointer_cast<T>(it->second.lock());
+      if (!casted)
+      {
+        std::cerr << "[UIManager] Element with name '" << name << "' is not of type " << typeid(T).name() << "!" << std::endl;
+        return std::weak_ptr<T>{}; // empty weakpointer
+      }
+
+      return casted;
+    }
+
     /**
      * @brief Updates all managed UI elements with the current mouse state.
      *
      * @param mousePosition The current position of the mouse.
      * @param mousePressed Whether the mouse is pressed.
      */
-    void Update(Vector2 mousePosition, bool mousePressed = false);
+    void Update(InputManager &InputManager);
 
     /**
      * @brief Removes an element by its name.

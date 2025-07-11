@@ -30,6 +30,9 @@ namespace LumidiGui
 
   template <typename T>
   concept DerivedFromUIBehavior = std::derived_from<T, Events::UIBehavior>;
+
+  template <typename T>
+  concept DerivedFromUICollider2D = std::derived_from<T, UICollider2D>;
 }
 
 #endif // LUMIDIGUI_CONCEPTS_H

@@ -18,12 +18,9 @@ namespace LumidiGui
     void Draw() const override;
 
     // Properties
-    std::string text;               // Text displayed on the button
-    Color color = LIGHTGRAY;        // Color of the button
-    Color hoverColor = DARKGRAY;    // Color when hovered
-    Color pressedColor = GRAY;      // Color when pressed
-    Color textColor = BLACK;        // Color of the button text
-    Color disabledColor = DARKGRAY; // Color when disabled
+    std::string text;              // Text displayed on the button
+    Color foregroundColor = BLACK; // Color of the button
+    Color backgroundColor = GRAY;  // Color when hovered
   };
 }
 

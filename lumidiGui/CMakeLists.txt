@@ -15,6 +15,7 @@ target_include_directories(lumidiGui PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/events
     ${CMAKE_CURRENT_SOURCE_DIR}/include/helpers
     ${CMAKE_CURRENT_SOURCE_DIR}/include/colors
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/input
 )
 
 # raylib binden

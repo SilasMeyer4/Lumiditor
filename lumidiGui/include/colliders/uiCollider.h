@@ -6,16 +6,16 @@
 namespace LumidiGui
 {
 
-  class UICollider
+  class UICollider2D
   {
   public:
     Vector2 position; // Position of the collider
     Vector2 size;     // Size of the collider
 
-    UICollider() = default;
-    UICollider(const Vector2 &position, const Vector2 &size) : position(position), size(size) {}
+    UICollider2D() = default;
+    UICollider2D(const Vector2 &position, const Vector2 &size) : position(position), size(size) {}
     virtual bool Contains(const Vector2 &point) const = 0;
-    virtual ~UICollider() = default;
+    virtual ~UICollider2D() = default;
   };
 }
 

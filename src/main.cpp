@@ -3,6 +3,7 @@
 #include "uiComponents.h"
 #include "uiEvents.h"
 #include "uiColliders.h"
+#include "inputManager.h"
 
 int main(int, char **)
 {
@@ -10,26 +11,37 @@ int main(int, char **)
     SetTargetFPS(60);
 
     LumidiGui::UIManager uiManager;
-    uiManager.Create<LumidiGui::Button>("su", Vector2{350, 400}, Vector2{100, 50}, "Click Me");
-    uiManager.GetElementByName("su").lock()->AddBehavior<LumidiGui::Events::ClickBehavior>(
+
+    // BUTTON
+    uiManager.Create<LumidiGui::Button>("test", Vector2{350, 400}, Vector2{100, 50}, "Click Me");
+    uiManager.GetElementByName("test").lock()->AddBehavior<LumidiGui::Events::ClickBehavior>(
         []()
         { std::cout << "Button clicked!" << std::endl; });
 
-    uiManager.CreateChild<LumidiGui::Button>("siii", "su", Vector2{350, 300}, Vector2{100, 50}, "Child Button siii");
+    uiManager.GetElementByName("test").lock()->AddBehavior<LumidiGui::Events::HoverBehavior>(
+        [&]()
+        { uiManager.GetElementByNameAs<LumidiGui::Button>("test").lock()->backgroundColor = GREEN; },
+        [&]()
+        { uiManager.GetElementByNameAs<LumidiGui::Button>("test").lock()->backgroundColor = DARKGRAY; });
 
-    uiManager.CreateChild<LumidiGui::Button>("slll", "su", Vector2{350, 200}, Vector2{100, 50}, "Child Button seee");
+    uiManager.GetElementByName("test").lock()->AddBehavior<LumidiGui::Events::DragBehavior>();
 
-    uiManager.GetElementByName("siii").lock()->AddBehavior<LumidiGui::Events::ClickBehavior>(
-        []()
-        { std::cout << "Button clicked wiwuw!" << std::endl; });
+    uiManager.Create<LumidiGui::Label>("label", Vector2{500, 500}, Vector2{150, 300}, "Label Wuu", 15, BLACK);
 
-    uiManager.MoveChildToParent("siii", "slll");
+    uiManager.GetElementByName("label").lock()->AddBehavior<LumidiGui::Events::DragBehavior>();
 
-    uiManager.RemoveElement("siii");
+    uiManager.GetElementByName("label").lock()->SetCollider<LumidiGui::RectangleCollider>();
+
+    uiManager.Create<LumidiGui::Rectangle>("rec", Vector2{350, 400}, Vector2{100, 50}, BLACK);
+
+    uiManager.GetElementByName("rec").lock()->SetCollider<LumidiGui::RectangleCollider>();
+
+    uiManager.GetElementByName("rec").lock()->AddBehavior<LumidiGui::Events::DragBehavior>();
 
     while (!WindowShouldClose())
     {
-        uiManager.Update(GetMousePosition(), IsMouseButtonPressed(MOUSE_LEFT_BUTTON));
+        LumidiGui::InputManager::GetInstance().HandleInput();
+        uiManager.Update(LumidiGui::InputManager::GetInstance());
 
         BeginDrawing();
         ClearBackground(RAYWHITE);

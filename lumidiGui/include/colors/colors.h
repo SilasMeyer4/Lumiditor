@@ -5,11 +5,11 @@
 
 namespace LumidiGui
 {
-  CLITERAL(Color)
-  CreateColorRGBA(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+  Color CreateColorRGBA(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
   {
-    return CLITERAL(Color){r, g, b, a}; // Default color: black with full opacity
+    return Color{r, g, b, a}; // Default color: black with full opacity
   }
+
 }
 
 #define LUMIDIGUI_COLOR(r, g, b, a) \

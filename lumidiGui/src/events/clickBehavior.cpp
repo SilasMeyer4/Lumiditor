@@ -1,9 +1,10 @@
 #include "clickBehavior.h"
 
-void LumidiGui::Events::ClickBehavior::Update(Vector2 mousePosition, bool mousePressed)
+void LumidiGui::Events::ClickBehavior::Update(InputManager &inputManager)
 {
-  if (mousePressed)
+  if (inputManager.GetMouseInput().leftButtonPressed)
   {
+    Vector2 mousePosition = inputManager.GetInstance().GetMouseInput().position;
     if (auto p = parent_.lock(); p && p->ContainsPoint(mousePosition))
     {
       if (onClick_)

@@ -2,6 +2,7 @@
 #define LUMIDIGUI_EVENTS_UIBEHAVIOR_H
 
 #include "raylib.h"
+#include "inputManager.h"
 #include <memory>
 
 namespace LumidiGui
@@ -16,7 +17,7 @@ namespace LumidiGui
       std::weak_ptr<UIElement2D> parent_;
 
     public:
-      virtual void Update(Vector2 mousePosition, bool mousePressed) {}
+      virtual void Update(InputManager &inputManager) {}
       UIBehavior(std::weak_ptr<UIElement2D> parent) : parent_(parent) {}
       virtual void Render() {}
       virtual ~UIBehavior() = default;
