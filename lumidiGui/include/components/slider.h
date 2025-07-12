@@ -3,6 +3,8 @@
 
 #include "raylib.h"
 #include "uiElement2D.h"
+#include "rectangle.h"
+#include "line.h"
 
 namespace LumidiGui
 {
@@ -10,14 +12,14 @@ namespace LumidiGui
   {
   private:
   public:
-    Slider(std::string name, Vector2 position, Vector2 size)
-        : UIElement2D(name, position, size), text(text) {}
-    ~Slider();
+    Slider(std::string name, Vector2 position, bool isVertical, Vector2 size)
+        : UIElement2D(name, position, size) { this->isVertical = isVertical; }
+    ~Slider() = default;
     void Draw() const override;
-    std::string text;
-    Color foregroundColor = BLACK;
-    Color backgroundColor;
-    int fontSize;
+
+    bool isVertical = false;
+    std::weak_ptr<Rectangle> thumb;
+    std::weak_ptr<Line> line;
   };
 }
 

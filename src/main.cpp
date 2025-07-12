@@ -38,6 +38,8 @@ int main(int, char **)
 
     uiManager.GetElementByName("rec").lock()->AddBehavior<LumidiGui::Events::DragBehavior>();
 
+    uiManager.Create<LumidiGui::Checkbox>("checkbox", Vector2{100, 100}, Vector2{30, 30}, true);
+
     while (!WindowShouldClose())
     {
         LumidiGui::InputManager::GetInstance().HandleInput();

@@ -1,5 +1,6 @@
 #include "UIManager.h"
 #include <iostream>
+#include "defaultBehaviors.h"
 
 namespace LumidiGui
 {
@@ -55,6 +56,11 @@ namespace LumidiGui
     }
 
     return false;
+  }
+
+  UIManager::UIManager()
+  {
+    LumidiGui::Events::InitalizeDefaultBehaviors(defaultBehaviorsRegistry_);
   }
 
   void UIManager::Draw() const

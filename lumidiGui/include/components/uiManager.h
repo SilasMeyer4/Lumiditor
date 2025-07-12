@@ -7,6 +7,7 @@
 #include <vector>
 #include <iostream>
 #include "inputManager.h"
+#include "defaultBehaviors.h"
 
 namespace LumidiGui
 {
@@ -22,12 +23,25 @@ namespace LumidiGui
   private:
     std::vector<std::shared_ptr<UIElement2D>> elements;                     // Vector to hold UI elements
     std::unordered_map<std::string, std::weak_ptr<UIElement2D>> elementMap; // Map to hold UI elements by name for quick access
-
+    std::unordered_map<std::type_index, std::vector<std::function<void(std::shared_ptr<LumidiGui::UIElement2D>)>>> defaultBehaviorsRegistry_;
     bool RemoveElement(std::shared_ptr<UIElement2D> element);
+
+    template <typename UIElementT>
+    void AddDefaultBehaviors(std::shared_ptr<UIElementT> element)
+    {
+      auto it = defaultBehaviorsRegistry_.find(typeid(UIElementT));
+      if (it != defaultBehaviorsRegistry_.end())
+      {
+        for (auto &factory : it->second)
+        {
+          factory(element);
+        }
+      }
+    }
 
   public:
     // Constructor
-    UIManager() = default;
+    UIManager();
 
     /**
      * @brief Flag to allow or disallow multiple UI elements with the same name.
@@ -47,6 +61,7 @@ namespace LumidiGui
       auto element = std::make_shared<T>(name, std::forward<Args>(args)...);
       elementMap[name] = element;
       elements.push_back(element);
+      AddDefaultBehaviors<T>(element);
       return element;
     }
 

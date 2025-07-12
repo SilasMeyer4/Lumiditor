@@ -4,5 +4,6 @@
 #include "clickBehavior.h"
 #include "hoverBehavior.h"
 #include "dragBehavior.h"
+#include "defaultBehaviors.h"
 
 #endif

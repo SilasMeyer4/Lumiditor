@@ -9,6 +9,7 @@
 namespace LumidiGui
 {
   class UIElement2D;
+  class Rectangle;
   namespace Events
   {
     class UIBehavior;
@@ -27,6 +28,9 @@ namespace LumidiGui
 
   template <typename T>
   concept DerivedFromUIElement2D = std::derived_from<T, UIElement2D>;
+
+  template <typename T>
+  concept RectangleType = std::same_as<T, LumidiGui::Rectangle>;
 
   template <typename T>
   concept DerivedFromUIBehavior = std::derived_from<T, Events::UIBehavior>;

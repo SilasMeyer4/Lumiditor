@@ -1,5 +1,5 @@
 #ifndef LUMIDITOR_LINE_H
-#define LUMIDITOR_LINEL_H
+#define LUMIDITOR_LINE_H
 
 #include "raylib.h"
 #include "uiElement2D.h"
@@ -10,11 +10,13 @@ namespace LumidiGui
   {
   private:
   public:
-    Line(std::string name, Vector2 position, Vector2 size, std::string text, int fontSize, Color color)
+    Line(std::string name, Vector2 startPosition, Vector2 endPosition, std::string text, int fontSize, Color color)
         : UIElement2D(name, position, size) {}
-    ~Line();
+    ~Line() = default;
     void Draw() const override;
-    Color color = GRAY;
+    Color color = BLACK;
+    float width;
+    Vector2 endPosition;
   };
 }
 

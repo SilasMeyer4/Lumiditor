@@ -1,5 +1,5 @@
-#ifndef LUMIDITOR_Rectangle_H
-#define LUMIDITOR_Rectangle_H
+#ifndef LUMIDITOR_RECTANGLE_H
+#define LUMIDITOR_RECTANGLE_H
 
 #include "raylib.h"
 #include "uiElement2D.h"
@@ -22,6 +22,13 @@ namespace LumidiGui
   public:
     Rectangle(std::string name, Vector2 position, Vector2 size, Color color)
         : UIElement2D(name, position, size), color(color) {}
+
+    Rectangle(std::string name, Vector2 position, Vector2 size, Color color, Border border)
+        : Rectangle(name, position, size, color)
+    {
+      this->hasBorder = true;
+      this->border = border;
+    }
 
     Rectangle(std::string name, Vector2 position, Vector2 size, Color color, float rotation)
         : Rectangle(name, position, size, color) { SetRotation(rotation); }
@@ -47,6 +54,7 @@ namespace LumidiGui
     float GetRotation() const;
     bool hasBorder = false;
     Border border;
+    bool isFilled = true;
   };
 }
 

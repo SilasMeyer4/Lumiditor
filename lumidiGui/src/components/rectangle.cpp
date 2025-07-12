@@ -4,9 +4,15 @@
 
 void LumidiGui::Rectangle::Draw() const
 {
+  Vector2 originPoint = {0, 0};
+
   ::Rectangle rec = {this->position.x, this->position.y, this->size.x, this->size.y};
-  DrawRectanglePro(rec,
-                   LumidiGui::CalculateCenterPoint(*this), rotation_, color);
+
+  if (isFilled)
+  {
+    DrawRectanglePro(rec, originPoint, rotation_, color);
+  }
+
   if (hasBorder)
   {
     if (this->border.isRounded)

@@ -16,7 +16,10 @@ target_include_directories(lumidiGui PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/helpers
     ${CMAKE_CURRENT_SOURCE_DIR}/include/colors
     ${CMAKE_CURRENT_SOURCE_DIR}/include/input
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/shapes
 )
+
+message(STATUS "lumidiGui source files: ${GUI_SRC}")
 
 # raylib binden
 find_package(raylib CONFIG REQUIRED)

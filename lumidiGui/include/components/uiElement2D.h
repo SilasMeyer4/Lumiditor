@@ -50,7 +50,7 @@ namespace LumidiGui
     template <DerivedFromUIBehavior BehaviorType, typename... Args>
     void AddBehavior(Args &&...args)
     {
-      behaviors_.push_back(std::make_unique<BehaviorType>(weak_from_this(), std::forward<Args>(args)...));
+      behaviors_.push_back(std::make_shared<BehaviorType>(weak_from_this(), std::forward<Args>(args)...));
     }
 
     bool ContainsPoint(Vector2 point) const;
