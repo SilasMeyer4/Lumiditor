@@ -24,8 +24,8 @@ jobs:
         git clone https://github.com/microsoft/vcpkg.git
         .\vcpkg\bootstrap-vcpkg.bat
 
-    - name: Install raylib with vcpkg
-      run: .\vcpkg\vcpkg.exe install raylib:x64-windows
+    - name: Install dependencies via vcpkg manifest
+      run: .\vcpkg\vcpkg.exe install
 
     - name: Configure CMake
       run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
