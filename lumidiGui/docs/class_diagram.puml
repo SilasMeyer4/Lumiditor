@@ -1,0 +1,258 @@
+@startuml class_diagram
+caption Date 2025-07-13
+title LumidiGui
+
+' this is rough diagram to help understand the architect and may not be up to date
+
+
+package Colliders {
+  class UICollider{
+
+  }
+
+  class RectangleCollider {
+
+  }
+
+}
+
+package components {
+   class UIManager {
+    - elements : vector<shared_ptr<UIElement2D>>
+    - elementMap : unordered_map<string, weak_ptr<UIElement2D>>
+    - defaultBehaviorsRegistry_ : unordered_map<type_index, vector<function<void(shared_ptr<UIElement2D>)>>>
+    - allowDuplicateNames : bool
+
+    + UIManager()
+    + GetElementByName(name : string) : weak_ptr<UIElement2D>
+    + RemoveElement(name : string) : bool
+    + MoveChildToParent(childName : string, newParentName : string) : bool
+    + Update(InputManager) : void
+    + Draw() : void
+
+    + Create<T>(name : string, args...) : weak_ptr<T>
+    + CreateChild<T>(name : string, parentName : string, args...) : weak_ptr<T>
+    + GetElementByNameAs<T>(name : string) : weak_ptr<T>
+    + RemoveElements<Elements...>(elements...) : bool
+  
+  }
+
+  abstract class UIElement2D {
+    - collider_ : shared_ptr<UICollider2D>
+    - behaviors_ : vector<shared_ptr<UIBehavior>>
+    - children_ : vector<shared_ptr<UIElement2D>>
+
+    + parent : weak_ptr<UIElement2D>
+    + position : Vector2
+    + size : Vector2
+    + isVisible : bool
+    + isEnabled : bool
+    + zIndex : int
+    + name : string
+
+    + UIElement2D(name : string, position : Vector2, size : Vector2)
+    + ~UIElement2D()
+
+    + Draw() : void
+    + Update(InputManager&) : void
+    + Render() : void
+    + GetCollider() : shared_ptr<UICollider2D>
+    + ContainsPoint(point : Vector2) : bool
+    + GetSharedPtr() : shared_ptr<UIElement2D>
+    + GetChildren() : vector<shared_ptr<UIElement2D>>
+    + GetBehaviors() : vector<shared_ptr<UIBehavior>>
+    + GetChildByName(name : string) : shared_ptr<UIElement2D>
+    + ClearAllChildren() : void
+    + RemoveChild(child : shared_ptr<UIElement2D>) : bool
+    + RemoveChild(name : string) : bool
+    + AddChild(child : shared_ptr<UIElement2D>) : bool
+
+    + SetCollider<Collider2DType, Args...>(args...) : void
+    + AddBehavior<BehaviorType, Args...>(args...) : void
+    + GetBehavior<BehaviorType>() : shared_ptr<BehaviorType>
+    + RemoveChildren<Children...>(children...) : bool
+    + AddChildren<Children...>(children...) : bool
+  }
+
+  class Border {
+    - isRounded : bool = false
+    - width : float = 0.0
+    - roundness : float = 0.0
+    - segments : int = 0
+    - color : Color = BLACK
+  }
+
+  class Rectangle {
+    - rotation_ : float = 0.0
+    + color : Color = GRAY
+    + hasBorder : bool = false
+    + border : Border
+    + isFilled : bool = true
+
+    + Rectangle(name : std::string, position : Vector2, size : Vector2, color : Color)
+    + Rectangle(name : std::string, position : Vector2, size : Vector2, color : Color, border : Border)
+    + Rectangle(name : std::string, position : Vector2, size : Vector2, color : Color, rotation : float)
+    + Rectangle(name : std::string, position : Vector2, size : Vector2, color : Color, rotation : float, border : Border)
+    + ~Rectangle()
+    + Draw() : void
+    + SetBorder(border : Border) : void
+    + SetRotation(rotation : float) : void
+    + GetRotation() : float
+  }
+
+  Rectangle ..|> UIElement2D
+
+   class Button {
+    + Button(name : string, position : Vector2, size : Vector2, text : string = "Button")
+    + ~Button()
+    + Draw() : void
+
+    + text : string
+    + foregroundColor : Color = BLACK
+    + backgroundColor : Color = GRAY
+  }
+
+  Button ..|> UIElement2D
+
+  class Checkbox {
+    - rectangle_ : unique_ptr<Rectangle>
+
+    + Checkbox(name : string, position : Vector2, size : Vector2)
+    + Checkbox(name : string, position : Vector2, size : Vector2, isChecked : bool)
+    + ~Checkbox()
+    + Draw() : void
+
+    + isChecked : bool = false
+    + backgroundColor : Color = GRAY
+
+    + SetBox<T, Args...>(args...) : void
+  }
+
+  Checkbox ..|> UIElement2D
+  Checkbox ..> Rectangle : uses
+
+    class Label {
+    + Label(name : string, position : Vector2, size : Vector2, text : string, fontSize : int, color : Color)
+    + ~Label()
+    + Draw() : void
+
+    + text : string
+    + foregroundColor : Color = BLACK
+    + backgroundColor : Color
+    + fontSize : int
+  }
+
+  Label ..|> UIElement2D
+
+  class Panel {
+
+  }
+
+  class Line {
+
+  }
+
+  
+
+  class Scrollbar {
+
+  }
+
+  class Slider {
+
+  }
+
+
+}
+
+UIManager "1" *-- "*" UIElement2D : manages UI elements
+
+package Events {
+
+  package Behaviors {
+     abstract class UIBehavior {
+      - parent_ : std::weak_ptr<UIElement2D>
+      + <<abstract>> Update(inputManager : InputManager) : void
+      + Render() : void
+      + ~UIBehavior()
+      + isEnabled : bool
+    }
+
+
+    class ClickBehavior {
+      - onClick_ : std::function<void()>
+      - isClicked_ : bool
+      + ClickBehavior(parent : std::weak_ptr<UIElement2D>, onClick : std::function<void()>)
+      + Update(inputManager : InputManager) : void
+    }
+
+    ClickBehavior ..|> UIBehavior
+
+
+     class DragBehavior {
+      - isDragging_ : bool
+      + DragBehavior(parent : std::weak_ptr<UIElement2D>)
+      + Update(inputManager : InputManager) : void
+    }
+
+    DragBehavior ..|> UIBehavior
+
+      class HoverBehavior {
+      - onHoverEnter_ : std::function<void()>
+      - onHoverLeave_ : std::function<void()>
+      - isHovering_ : bool
+      + HoverBehavior(parent : std::weak_ptr<UIElement2D>, onEnter : std::function<void()>, onLeave : std::function<void()>)
+      + Update(inputManager : InputManager) : void
+    }
+
+    HoverBehavior ..|> UIBehavior
+
+  }
+
+  class GlobalEventManager {
+
+  }
+
+
+
+
+}
+
+package Shapes {
+  annotation DrawShape <<utility>> {
+    +DrawCross()
+  }
+}
+
+package Input {
+  class InputManager {
+
+  }
+}
+
+package Concepts {
+    interface "StringLike" <<concept>> {
+    + convertible_to<std::string_view>
+  }
+
+  interface "SharedPointerType" <<concept>> {
+    + shared_ptr<T>
+  }
+
+  interface "DerivedFromUIElement2D" <<concept>> {
+    + T : UIElement2D
+  }
+
+  interface "RectangleType" <<concept>> {
+    + T = Rectangle
+  }
+
+  interface "DerivedFromUIBehavior" <<concept>> {
+    + T : UIBehavior
+  }
+}
+
+
+
+
+@enduml

@@ -15,22 +15,13 @@ namespace LumidiGui
     class DragBehavior : public UIBehavior
     {
     private:
-      bool isDragging_ = false;     // Track if the button was clicked
-      Vector2 lastElementPosition_; // Store the initial position when dragging starts
-      Vector2 lastMousePosition_;
-      int leaveTimerMs_ = 100;
-      int leaveCounter_ = 0;
+      bool isDragging_ = false; // Track if the button was clicked
 
     public:
       DragBehavior(std::weak_ptr<UIElement2D> parent)
           : UIBehavior(parent) {}
 
       void Update(InputManager &inputManager) override;
-
-      void SetLeaveTimerMs(int miliseconds)
-      {
-        leaveTimerMs_ = miliseconds;
-      }
     };
   }
 }

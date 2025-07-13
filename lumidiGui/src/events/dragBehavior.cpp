@@ -13,7 +13,6 @@ void LumidiGui::Events::DragBehavior::Update(InputManager &inputManager)
       {
 
         isDragging_ = true;
-        lastMousePosition_ = mousePosition;
       }
     }
     else
