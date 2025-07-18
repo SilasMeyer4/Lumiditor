@@ -12,6 +12,7 @@ add_library(lumidiGui STATIC ${GUI_SRC})
 target_include_directories(lumidiGui PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/components
     ${CMAKE_CURRENT_SOURCE_DIR}/include/colliders
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/fluentAPI
     ${CMAKE_CURRENT_SOURCE_DIR}/include/events
     ${CMAKE_CURRENT_SOURCE_DIR}/include/helpers
     ${CMAKE_CURRENT_SOURCE_DIR}/include/colors
