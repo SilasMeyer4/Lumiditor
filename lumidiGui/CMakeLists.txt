@@ -10,7 +10,9 @@ add_library(lumidiGui STATIC ${GUI_SRC})
 
 # Header-Verzeichnisse (öffentlich, damit Tests sie auch sehen)
 target_include_directories(lumidiGui PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/components
+${CMAKE_CURRENT_SOURCE_DIR}/include/components
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/components/3D
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/components/2D
     ${CMAKE_CURRENT_SOURCE_DIR}/include/colliders
     ${CMAKE_CURRENT_SOURCE_DIR}/include/fluentAPI
     ${CMAKE_CURRENT_SOURCE_DIR}/include/events

@@ -1,8 +1,8 @@
-#include "uiElement2D.h"
+#include "element.h"
 
 namespace LumidiGui
 {
-  void UIElement2D::DrawChildren() const
+  void Element::DrawChildren() const
   {
     for (const auto &child : children_)
     {
@@ -13,11 +13,11 @@ namespace LumidiGui
     }
   }
 
-  UIElement2D::UIElement2D(std::string name, Vector2 position, Vector2 size) : name(name), position(position), size(size)
+  Element::Element(std::string name, Vector3 position, Vector3 size) : name(name), position(position), size(size)
   {
   }
 
-  void UIElement2D::Update(InputManager &inputManager)
+  void Element::Update(InputManager &inputManager)
   {
     for (auto &behavior : behaviors_)
     {
@@ -36,7 +36,7 @@ namespace LumidiGui
     }
   }
 
-  void UIElement2D::Render()
+  void Element::Render()
   {
     for (auto &behavior : behaviors_)
     {
@@ -55,37 +55,48 @@ namespace LumidiGui
     }
   }
 
-  bool UIElement2D::ContainsPoint(Vector2 point) const
+  // bool Element::ContainsPoint(Vector2 point) const
+  // {
+  //   return collider_ ? collider_->Contains(point) : false;
+  // }
+
+  // std::shared_ptr<UICollider2D> Element::GetCollider() const
+  // {
+  //   return collider_;
+  // }
+
+  bool Element::ContainsPoint(std::string label, Vector2 point) const
   {
-    return collider_ ? collider_->Contains(point) : false;
+    auto collider = colliders_.find(label);
+    if (collider != colliders_.end())
+    {
+      return collider->second->Contains(point);
+    }
+
+    return false;
   }
 
-  std::shared_ptr<UICollider2D> UIElement2D::GetCollider() const
-  {
-    return collider_;
-  }
-
-  std::shared_ptr<UIElement2D> UIElement2D::GetSharedPtr()
+  std::shared_ptr<Element> Element::GetSharedPtr()
   {
     return shared_from_this();
   }
 
-  std::vector<std::shared_ptr<UIElement2D>> UIElement2D::GetChildren() const
+  std::vector<std::shared_ptr<Element>> Element::GetChildren() const
   {
     return children_;
   }
 
-  std::vector<std::shared_ptr<Events::UIBehavior>> UIElement2D::GetBehaviors() const
+  std::vector<std::shared_ptr<Events::UIBehavior>> Element::GetBehaviors() const
   {
     return behaviors_;
   }
 
-  void UIElement2D::Draw() const
+  void Element::Draw() const
   {
     DrawChildren();
   }
 
-  bool UIElement2D::RemoveChild(std::shared_ptr<UIElement2D> child)
+  bool Element::RemoveChild(std::shared_ptr<Element> child)
   {
     auto it = std::remove(children_.begin(), children_.end(), child);
     if (it != children_.end())
@@ -97,7 +108,7 @@ namespace LumidiGui
     return false;
   }
 
-  bool UIElement2D::RemoveChild(const std::string &name)
+  bool Element::RemoveChild(const std::string &name)
   {
     auto child = GetChildByName(name);
     if (child)
@@ -107,7 +118,18 @@ namespace LumidiGui
     return false; // Return false if no child with the given name is found
   }
 
-  std::shared_ptr<UIElement2D> UIElement2D::GetChildByName(const std::string &name) const
+  std::shared_ptr<Collider> Element::GetCollider(const std::string &label) const
+  {
+    auto it = colliders_.find(label);
+    if (it != colliders_.end())
+    {
+      return it->second;
+    }
+
+    return nullptr;
+  }
+
+  std::shared_ptr<Element> Element::GetChildByName(const std::string &name) const
   {
     for (const auto &child : children_)
     {
@@ -119,7 +141,7 @@ namespace LumidiGui
     return nullptr; // Return nullptr if no child with the given name is found
   }
 
-  bool UIElement2D::AddChild(std::shared_ptr<UIElement2D> child)
+  bool Element::AddChild(std::shared_ptr<Element> child)
   {
     if (!child)
     {
@@ -140,7 +162,7 @@ namespace LumidiGui
     children_.push_back(child);
     return true;
   }
-  void UIElement2D::ClearAllChildren()
+  void Element::ClearAllChildren()
   {
     for (auto &child : children_)
     {

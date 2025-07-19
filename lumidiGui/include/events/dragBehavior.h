@@ -5,7 +5,7 @@
 #include <functional>
 
 #include "uiBehavior.h"
-#include "uiElement2D.h"
+#include "element.h"
 #include "inputManager.h"
 
 namespace LumidiGui
@@ -18,7 +18,7 @@ namespace LumidiGui
       bool isDragging_ = false; // Track if the button was clicked
 
     public:
-      DragBehavior(std::weak_ptr<UIElement2D> parent)
+      DragBehavior(std::weak_ptr<Element> parent)
           : UIBehavior(parent) {}
 
       void Update(InputManager &inputManager) override;

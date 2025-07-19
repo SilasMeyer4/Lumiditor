@@ -9,7 +9,7 @@ void LumidiGui::Events::DragBehavior::Update(InputManager &inputManager)
 
     if (!isDragging_)
     {
-      if (auto p = parent_.lock(); p && p->ContainsPoint(mousePosition))
+      if (auto p = parent_.lock(); p && p->ContainsPoint("default", mousePosition))
       {
 
         isDragging_ = true;
@@ -21,8 +21,9 @@ void LumidiGui::Events::DragBehavior::Update(InputManager &inputManager)
 
       if (auto p = parent_.lock())
       {
-        p->position += offset;
-        p->GetCollider()->position += offset;
+        p->position += Vector3{offset.x, offset.y, 0};
+        // TODO change form default to registered label
+        p->GetCollider("default")->position += Vector3{offset.x, offset.y, 0};
       }
     }
   }

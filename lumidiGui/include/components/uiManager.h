@@ -2,7 +2,7 @@
 #define LUMIDITOR_UIMANAGER_H
 
 #include <memory>
-#include "uiElement2D.h"
+#include "element.h"
 #include "concepts.h"
 #include <vector>
 #include <iostream>
@@ -21,10 +21,10 @@ namespace LumidiGui
   class UIManager
   {
   private:
-    std::vector<std::shared_ptr<UIElement2D>> elements;                     // Vector to hold UI elements
-    std::unordered_map<std::string, std::weak_ptr<UIElement2D>> elementMap; // Map to hold UI elements by name for quick access
-    std::unordered_map<std::type_index, std::vector<std::function<void(std::shared_ptr<LumidiGui::UIElement2D>)>>> defaultBehaviorsRegistry_;
-    bool RemoveElement(std::shared_ptr<UIElement2D> element);
+    std::vector<std::shared_ptr<Element>> elements;                     // Vector to hold UI elements
+    std::unordered_map<std::string, std::weak_ptr<Element>> elementMap; // Map to hold UI elements by name for quick access
+    std::unordered_map<std::type_index, std::vector<std::function<void(std::shared_ptr<LumidiGui::Element>)>>> defaultBehaviorsRegistry_;
+    bool RemoveElement(std::shared_ptr<Element> element);
 
     template <typename UIElementT>
     void AddDefaultBehaviors(std::shared_ptr<UIElementT> element)
@@ -95,7 +95,7 @@ namespace LumidiGui
      * @param name Name of the element.
      * @return A weak pointer to the element, or nullptr if not found.
      */
-    std::weak_ptr<UIElement2D> GetElementByName(const std::string &name) const;
+    std::weak_ptr<Element> GetElementByName(const std::string &name) const;
 
     template <DerivedFromUIElement2D T>
     std::weak_ptr<T> GetElementByNameAs(const std::string &name) const

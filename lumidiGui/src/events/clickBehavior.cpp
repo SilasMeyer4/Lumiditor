@@ -5,7 +5,7 @@ void LumidiGui::Events::ClickBehavior::Update(InputManager &inputManager)
   if (inputManager.GetMouseInput().leftButtonPressed)
   {
     Vector2 mousePosition = inputManager.GetInstance().GetMouseInput().position;
-    if (auto p = parent_.lock(); p && p->ContainsPoint(mousePosition))
+    if (auto p = parent_.lock(); p && p->ContainsPoint("default", mousePosition))
     {
       if (onClick_)
       {

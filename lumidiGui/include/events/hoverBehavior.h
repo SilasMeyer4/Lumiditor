@@ -5,7 +5,7 @@
 #include <functional>
 
 #include "uiBehavior.h"
-#include "uiElement2D.h"
+#include "element.h"
 
 namespace LumidiGui
 {
@@ -19,7 +19,7 @@ namespace LumidiGui
       bool isHovering_ = false;
 
     public:
-      HoverBehavior(std::weak_ptr<UIElement2D> parent, std::function<void()> onEnter, std::function<void()> onLeave)
+      HoverBehavior(std::weak_ptr<Element> parent, std::function<void()> onEnter, std::function<void()> onLeave)
           : UIBehavior(parent), onHoverEnter_(std::move(onEnter)), onHoverLeave_(std::move(onLeave)) {}
 
       void Update(InputManager &inputManager) override;

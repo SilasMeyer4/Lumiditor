@@ -27,4 +27,30 @@ inline Vector2 &operator-=(Vector2 &a, const Vector2 &b)
   return a;
 }
 
+inline Vector3 operator+(const Vector3 &a, const Vector3 &b)
+{
+  return {a.x + b.x, a.y + b.y, a.z + b.z};
+}
+
+inline Vector3 operator-(const Vector3 &a, const Vector3 &b)
+{
+  return {a.x - b.x, a.y - b.y, a.z - b.z};
+}
+
+inline Vector3 &operator+=(Vector3 &a, const Vector3 &b)
+{
+  a.x += b.x;
+  a.y += b.y;
+  a.z += b.z;
+  return a;
+}
+
+inline Vector3 &operator-=(Vector3 &a, const Vector3 &b)
+{
+  a.x -= b.x;
+  a.y -= b.y;
+  a.z -= b.z;
+  return a;
+}
+
 #endif

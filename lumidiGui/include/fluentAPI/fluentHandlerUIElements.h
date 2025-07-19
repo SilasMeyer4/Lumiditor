@@ -12,9 +12,9 @@ namespace LumidiGui
     class FluentHandlerUIElements : public FluentHandler<T>
     {
     private:
-      std::shared_ptr<UIElement2D> LockAsBase() const
+      std::shared_ptr<Element> LockAsBase() const
       {
-        return std::static_pointer_cast<UIElement2D>(weakPtr_.lock());
+        return std::static_pointer_cast<Element>(weakPtr_.lock());
       }
 
     public:

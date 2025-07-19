@@ -1,4 +1,4 @@
-#include "UIManager.h"
+#include "uiManager.h"
 #include <iostream>
 #include "defaultBehaviors.h"
 
@@ -27,7 +27,7 @@ namespace LumidiGui
     return false; // Return false if the element was not found
   }
 
-  bool UIManager::RemoveElement(std::shared_ptr<UIElement2D> element)
+  bool UIManager::RemoveElement(std::shared_ptr<Element> element)
   {
     if (!element)
       return false;
@@ -74,9 +74,9 @@ namespace LumidiGui
     }
   }
 
-  std::weak_ptr<UIElement2D> UIManager::GetElementByName(const std::string &name) const
+  std::weak_ptr<Element> UIManager::GetElementByName(const std::string &name) const
   {
     auto it = elementMap.find(name);
-    return (it != elementMap.end()) ? it->second : std::weak_ptr<UIElement2D>{};
+    return (it != elementMap.end()) ? it->second : std::weak_ptr<Element>{};
   }
 }

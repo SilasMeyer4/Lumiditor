@@ -5,7 +5,7 @@
 #include <functional>
 
 #include "uiBehavior.h"
-#include "uiElement2D.h"
+#include "element.h"
 
 namespace LumidiGui
 {
@@ -18,7 +18,7 @@ namespace LumidiGui
       bool isClicked_ = false; // Track if the button was clicked
 
     public:
-      ClickBehavior(std::weak_ptr<UIElement2D> parent, std::function<void()> onClick)
+      ClickBehavior(std::weak_ptr<Element> parent, std::function<void()> onClick)
           : UIBehavior(parent), onClick_(std::move(onClick)) {}
 
       void Update(InputManager &inputManager) override;

@@ -2,7 +2,7 @@
 #define LUMIDITOR_CHECKBOX_H
 
 #include "raylib.h"
-#include "uiElement2D.h"
+#include "element2D.h"
 #include "concepts.h"
 #include "rectangle.h"
 #include "uiEvents.h"
@@ -12,7 +12,7 @@
 
 namespace LumidiGui
 {
-  class Checkbox : public UIElement2D
+  class Checkbox : public Element2D
   {
   private:
     // TODO
@@ -20,9 +20,9 @@ namespace LumidiGui
 
   public:
     Checkbox(std::string name, Vector2 position, Vector2 size)
-        : UIElement2D(name, position, size)
+        : Element2D(name, position, size)
     {
-      this->SetCollider<LumidiGui::RectangleCollider>();
+      this->AddCollider<LumidiGui::RectangleCollider>("default");
       SetBox<LumidiGui::Rectangle>("checkbox", position, size, GRAY, Border{.isRounded = false, .width = 2.0f, .roundness = 0.0f, .segments = 0, .color = BLACK});
       std::cout << "Created Checkbox" << std::endl;
     }

@@ -2,18 +2,18 @@
 #define LUMIDITOR_SLIDER_H
 
 #include "raylib.h"
-#include "uiElement2D.h"
+#include "element2D.h"
 #include "rectangle.h"
 #include "line.h"
 
 namespace LumidiGui
 {
-  class Slider : public UIElement2D
+  class Slider : public Element2D
   {
   private:
   public:
     Slider(std::string name, Vector2 position, bool isVertical, Vector2 size)
-        : UIElement2D(name, position, size) { this->isVertical = isVertical; }
+        : Element2D(name, position, size) { this->isVertical = isVertical; }
     ~Slider() = default;
     void Draw() const override;
 

@@ -3,7 +3,7 @@
 void LumidiGui::Events::HoverBehavior::Update(InputManager &inputManager)
 {
   Vector2 mousePosition = inputManager.GetMouseInput().position;
-  if (auto p = parent_.lock(); p && p->ContainsPoint(mousePosition))
+  if (auto p = parent_.lock(); p && p->ContainsPoint("default", mousePosition))
   {
     if (!isHovering_)
     {

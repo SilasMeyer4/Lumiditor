@@ -2,13 +2,13 @@
 #define LUMIDITOR_BUTTON_H
 
 #include "raylib.h"
-#include "uiElement2D.h"
+#include "element2D.h"
 #include <string>
 #include <functional>
 
 namespace LumidiGui
 {
-  class Button : public UIElement2D
+  class Button : public Element2D
   {
   private:
     /* data */

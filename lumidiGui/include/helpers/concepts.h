@@ -8,8 +8,9 @@
 
 namespace LumidiGui
 {
-  class UIElement2D;
+  class Element;
   class Rectangle;
+  class Collider;
   namespace Events
   {
     class UIBehavior;
@@ -27,7 +28,7 @@ namespace LumidiGui
   concept StringLikeOrSharedPointerType = StringLike<T> || SharedPointerType<T>;
 
   template <typename T>
-  concept DerivedFromUIElement2D = std::derived_from<T, UIElement2D>;
+  concept DerivedFromUIElement2D = std::derived_from<T, Element>;
 
   template <typename T>
   concept RectangleType = std::same_as<T, LumidiGui::Rectangle>;
@@ -36,7 +37,7 @@ namespace LumidiGui
   concept DerivedFromUIBehavior = std::derived_from<T, Events::UIBehavior>;
 
   template <typename T>
-  concept DerivedFromUICollider2D = std::derived_from<T, UICollider2D>;
+  concept DerivedFromCollider = std::derived_from<T, Collider>;
 }
 
 #endif // LUMIDIGUI_CONCEPTS_H

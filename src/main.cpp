@@ -30,11 +30,11 @@ int main(int, char **)
 
     uiManager.GetElementByName("label").lock()->AddBehavior<LumidiGui::Events::DragBehavior>();
 
-    uiManager.GetElementByName("label").lock()->SetCollider<LumidiGui::RectangleCollider>();
+    uiManager.GetElementByName("label").lock()->AddCollider<LumidiGui::RectangleCollider>("default");
 
     uiManager.Create<LumidiGui::Rectangle>("rec", Vector2{350, 400}, Vector2{100, 50}, BLACK);
 
-    uiManager.GetElementByName("rec").lock()->SetCollider<LumidiGui::RectangleCollider>();
+    uiManager.GetElementByName("rec").lock()->AddCollider<LumidiGui::RectangleCollider>("default");
 
     uiManager.GetElementByName("rec").lock()->AddBehavior<LumidiGui::Events::DragBehavior>();
 

@@ -1,8 +1,8 @@
-#ifndef LUMIDITOR_UIELEMENT2D_H
-#define LUMIDITOR_UIELEMENT2D_H
+#ifndef LUMIDIGUI_ELEMENT_H
+#define LUMIDIGUI_ELEMENT_H
 
 #include "raylib.h"
-#include "uiCollider.h"
+#include "collider.h"
 #include "uiBehavior.h"
 #include "concepts.h"
 #include "inputManager.h"
@@ -13,39 +13,39 @@
 namespace LumidiGui
 {
 
-  class UIElement2D : public std::enable_shared_from_this<UIElement2D>
+  class Element : public std::enable_shared_from_this<Element>
   {
   private:
-    std::shared_ptr<UICollider2D> collider_;                     // collider UI elements
-    std::vector<std::shared_ptr<Events::UIBehavior>> behaviors_; // behaviors for UI elements
-    std::vector<std::shared_ptr<UIElement2D>> children_;         // Children UI elements
+    std::unordered_map<std::string, std::shared_ptr<Collider>> colliders_; // collider UI elements
+    std::vector<std::shared_ptr<Events::UIBehavior>> behaviors_;           // behaviors for UI elements
+    std::vector<std::shared_ptr<Element>> children_;                       // Children UI elements
 
   protected:
     void DrawChildren() const;
 
   public:
-    UIElement2D(std::string name, Vector2 position, Vector2 size);
-    ~UIElement2D() = default;
+    Element(std::string name, Vector3 position, Vector3 size);
+    ~Element() = default;
 
     virtual void Draw() const; // Function to draw the UI element, can be overriden in derived classes
-    std::weak_ptr<UIElement2D> parent;
+    std::weak_ptr<Element> parent;
     virtual void Update(InputManager &inputManager); // Function to update the UI element, can be overridden in derived classes
     virtual void Render();
 
-    template <DerivedFromUICollider2D Collider2DType, typename... Args>
-    void SetCollider(Args &&...args)
+    template <DerivedFromCollider ColliderType, typename... Args>
+    void AddCollider(std::string label, Args &&...args)
     {
       if constexpr (sizeof...(Args) == 0)
       {
-        collider_ = std::make_shared<Collider2DType>(this->position, this->size);
+        colliders_[label] = std::make_shared<ColliderType>(this->position, this->size);
       }
       else
       {
-        collider_ = std::make_shared<Collider2DType>(std::forward<Args>(args)...);
+        colliders_[label] = std::make_shared<ColliderType>(std::forward<Args>(args)...);
       }
     }
 
-    std::shared_ptr<UICollider2D> GetCollider() const;
+    std::shared_ptr<Collider> GetCollider(const std::string &label) const;
 
     template <DerivedFromUIBehavior BehaviorType, typename... Args>
     void AddBehavior(Args &&...args)
@@ -53,10 +53,10 @@ namespace LumidiGui
       behaviors_.push_back(std::make_shared<BehaviorType>(weak_from_this(), std::forward<Args>(args)...));
     }
 
-    bool ContainsPoint(Vector2 point) const;
+    bool ContainsPoint(std::string label, Vector2 point) const;
 
-    std::shared_ptr<UIElement2D> GetSharedPtr();
-    std::vector<std::shared_ptr<UIElement2D>> GetChildren() const;
+    std::shared_ptr<Element> GetSharedPtr();
+    std::vector<std::shared_ptr<Element>> GetChildren() const;
     std::vector<std::shared_ptr<Events::UIBehavior>> GetBehaviors() const;
 
     template <DerivedFromUIBehavior BehaviorType>
@@ -72,7 +72,7 @@ namespace LumidiGui
       return nullptr; // Return nullptr if no behavior of the specified type is found
     }
 
-    bool RemoveChild(std::shared_ptr<UIElement2D> child);
+    bool RemoveChild(std::shared_ptr<Element> child);
     bool RemoveChild(const std::string &name);
 
     template <StringLikeOrSharedPointerType... Children>
@@ -81,7 +81,7 @@ namespace LumidiGui
       return (RemoveChild(std::forward<Children>(children)) && ...);
     }
 
-    bool AddChild(std::shared_ptr<UIElement2D> child);
+    bool AddChild(std::shared_ptr<Element> child);
 
     template <SharedPointerType... Children>
     bool AddChildren(Children &&...children)
@@ -89,12 +89,12 @@ namespace LumidiGui
       return (AddChild(std::forward<Children>(children)) && ...);
     }
 
-    std::shared_ptr<UIElement2D> GetChildByName(const std::string &name) const;
+    std::shared_ptr<Element> GetChildByName(const std::string &name) const;
 
     void ClearAllChildren();
 
-    Vector2 position;      // Position of the UI element
-    Vector2 size;          // Size of the UI element
+    Vector3 position;      // Position of the UI element
+    Vector3 size;          // Size of the UI element
     bool isVisible = true; // Visibility of the UI element
     bool isEnabled = true; // Enabled state of the UI element
     int zIndex = 0;        // Z-index for rendering order
@@ -102,4 +102,4 @@ namespace LumidiGui
   };
 }
 
-#endif // LUMIDITOR_UIELEMENT2D_H
+#endif // LUMIDIGUI_ELEMENT_H

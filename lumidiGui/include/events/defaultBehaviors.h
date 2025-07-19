@@ -2,7 +2,7 @@
 #define LUMIDIGUI_EVENTS_DEFAULTBEHAVIORS_H
 
 #include "checkbox.h"
-#include "uiElement2D.h"
+#include "element.h"
 #include "uiEvents.h"
 #include "concepts.h"
 #include <memory>
@@ -15,9 +15,9 @@ namespace LumidiGui
 {
   namespace Events
   {
-    using BehaviorFactory = std::function<void(std::shared_ptr<LumidiGui::UIElement2D>)>;
+    using BehaviorFactory = std::function<void(std::shared_ptr<LumidiGui::Element>)>;
 
-    void InitalizeDefaultBehaviors(std::unordered_map<std::type_index, std::vector<std::function<void(std::shared_ptr<LumidiGui::UIElement2D>)>>> &defaultBehaviorsRegistry);
+    void InitalizeDefaultBehaviors(std::unordered_map<std::type_index, std::vector<std::function<void(std::shared_ptr<LumidiGui::Element>)>>> &defaultBehaviorsRegistry);
 
   }
 
