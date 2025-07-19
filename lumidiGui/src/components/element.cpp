@@ -129,6 +129,20 @@ namespace LumidiGui
     return nullptr;
   }
 
+  bool Element::RenameCollider(const std::string &oldLabel, const std::string &newLabel)
+  {
+    auto it = colliders_.find(oldLabel);
+    if (it == colliders_.end())
+      return false;
+    if (colliders_.count(newLabel) > 0)
+      return false;
+
+    auto collider = it->second;
+    colliders_.erase(it);
+    colliders_[newLabel] = collider;
+    return true;
+  }
+
   std::shared_ptr<Element> Element::GetChildByName(const std::string &name) const
   {
     for (const auto &child : children_)

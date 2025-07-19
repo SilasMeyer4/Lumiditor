@@ -18,17 +18,15 @@ int main(int, char **)
         []()
         { std::cout << "Button clicked!" << std::endl; });
 
-    uiManager.GetElementByName("test").lock()->AddBehavior<LumidiGui::Events::HoverBehavior>(
-        [&]()
-        { uiManager.GetElementByNameAs<LumidiGui::Button>("test").lock()->backgroundColor = GREEN; },
-        [&]()
-        { uiManager.GetElementByNameAs<LumidiGui::Button>("test").lock()->backgroundColor = DARKGRAY; });
+    uiManager.GetElementByName("test").lock()->AddBehavior<LumidiGui::Events::HoverBehavior>("default", [&]()
+                                                                                             { uiManager.GetElementByNameAs<LumidiGui::Button>("test").lock()->backgroundColor = GREEN; }, [&]()
+                                                                                             { uiManager.GetElementByNameAs<LumidiGui::Button>("test").lock()->backgroundColor = DARKGRAY; });
 
-    uiManager.GetElementByName("test").lock()->AddBehavior<LumidiGui::Events::DragBehavior>();
+    uiManager.GetElementByName("test").lock()->AddBehavior<LumidiGui::Events::DragBehavior>("default");
 
     uiManager.Create<LumidiGui::Label>("label", Vector2{500, 500}, Vector2{150, 300}, "Label Wuu", 15, BLACK);
 
-    uiManager.GetElementByName("label").lock()->AddBehavior<LumidiGui::Events::DragBehavior>();
+    uiManager.GetElementByName("label").lock()->AddBehavior<LumidiGui::Events::DragBehavior>("default");
 
     uiManager.GetElementByName("label").lock()->AddCollider<LumidiGui::RectangleCollider>("default");
 
@@ -36,7 +34,7 @@ int main(int, char **)
 
     uiManager.GetElementByName("rec").lock()->AddCollider<LumidiGui::RectangleCollider>("default");
 
-    uiManager.GetElementByName("rec").lock()->AddBehavior<LumidiGui::Events::DragBehavior>();
+    uiManager.GetElementByName("rec").lock()->AddBehavior<LumidiGui::Events::DragBehavior>("default");
 
     uiManager.Create<LumidiGui::Checkbox>("checkbox", Vector2{100, 100}, Vector2{30, 30}, true);
 

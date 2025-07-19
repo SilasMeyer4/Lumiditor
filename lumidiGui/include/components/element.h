@@ -46,6 +46,7 @@ namespace LumidiGui
     }
 
     std::shared_ptr<Collider> GetCollider(const std::string &label) const;
+    bool RenameCollider(const std::string &oldLabel, const std::string &newLabel);
 
     template <DerivedFromUIBehavior BehaviorType, typename... Args>
     void AddBehavior(Args &&...args)
