@@ -11,6 +11,7 @@ namespace LumidiGui
   class Element;
   class Rectangle;
   class Collider;
+  class Scene;
   namespace Events
   {
     class UIBehavior;
@@ -38,6 +39,9 @@ namespace LumidiGui
 
   template <typename T>
   concept DerivedFromCollider = std::derived_from<T, Collider>;
+
+  template <typename T>
+  concept DerivedFromScene = std::derived_from<T, Scene>;
 }
 
 #endif // LUMIDIGUI_CONCEPTS_H

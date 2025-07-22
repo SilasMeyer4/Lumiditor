@@ -8,11 +8,15 @@ namespace LumidiGui
   void UIManager::Update(InputManager &inputManager)
   {
 
-    for (const auto &element : elements)
+    auto scene = UIManager::activeScene_.lock();
+    if (!scene)
+      return;
+
+    if (auto root = scene->GetRootElement().lock())
     {
-      if (element->isEnabled)
+      if (root->isVisible)
       {
-        element->Update(inputManager);
+        root->Update(inputManager);
       }
     }
   }
@@ -32,30 +36,31 @@ namespace LumidiGui
     if (!element)
       return false;
 
-    elementMap.erase(element->name);
+    auto scene = UIManager::activeScene_.lock();
+    if (!scene)
+      return false;
 
-    if (element->parent.expired())
+    if (!element->parent.lock())
     {
-      auto it = std::remove_if(elements.begin(), elements.end(),
-                               [&](const auto &el)
-                               { return el == element; });
-
-      if (it != elements.end())
-      {
-        elements.erase(it, elements.end());
-        return true;
-      }
-    }
-    else
-    {
-      if (auto parent = element->parent.lock())
-      {
-        parent->RemoveChild(element);
-        return true; // Element was removed from its parent
-      }
+      std::cerr << "[UIManager] Cannot remove root element '" << element->name << "'!" << std::endl;
+      return false;
     }
 
+    if (auto parent = element->parent.lock())
+    {
+      parent->RemoveChild(element);
+    }
+
+    scene->GetElementsMap().erase(element->name);
     return false;
+  }
+
+  std::shared_ptr<Scene> UIManager::GetScene(const std::string &sceneName) const
+  {
+    auto it = scenes_.find(sceneName);
+    if (it == scenes_.end())
+      return nullptr;
+    auto scene = it->second;
   }
 
   UIManager::UIManager()
@@ -65,18 +70,26 @@ namespace LumidiGui
 
   void UIManager::Draw() const
   {
-    for (const auto &element : elements)
+    auto scene = UIManager::activeScene_.lock();
+    if (!scene)
+      return;
+
+    if (auto root = scene->GetRootElement().lock())
     {
-      if (element->isVisible)
+      if (root->isVisible)
       {
-        element->Draw();
+        root->Draw();
       }
     }
   }
 
   std::weak_ptr<Element> UIManager::GetElementByName(const std::string &name) const
   {
-    auto it = elementMap.find(name);
-    return (it != elementMap.end()) ? it->second : std::weak_ptr<Element>{};
+    auto scene = UIManager::activeScene_.lock();
+    if (!scene)
+      return std::weak_ptr<Element>{};
+
+    auto it = scene->GetElementsMap().find(name);
+    return (it != scene->GetElementsMap().end()) ? it->second : std::weak_ptr<Element>{};
   }
 }

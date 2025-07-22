@@ -8,6 +8,7 @@
 #include <iostream>
 #include "inputManager.h"
 #include "defaultBehaviors.h"
+#include "scene.h"
 
 namespace LumidiGui
 {
@@ -21,10 +22,12 @@ namespace LumidiGui
   class UIManager
   {
   private:
-    std::vector<std::shared_ptr<Element>> elements;                     // Vector to hold UI elements
-    std::unordered_map<std::string, std::weak_ptr<Element>> elementMap; // Map to hold UI elements by name for quick access
+    std::weak_ptr<Scene> activeScene_;
+    std::unordered_map<std::string, std::shared_ptr<Scene>> scenes_; // Vector to hold UI elements
     std::unordered_map<std::type_index, std::vector<std::function<void(std::shared_ptr<LumidiGui::Element>)>>> defaultBehaviorsRegistry_;
     bool RemoveElement(std::shared_ptr<Element> element);
+
+    std::shared_ptr<Scene> GetScene(const std::string &sceneName) const;
 
     template <typename UIElementT>
     void AddDefaultBehaviors(std::shared_ptr<UIElementT> element)
@@ -43,33 +46,42 @@ namespace LumidiGui
     // Constructor
     UIManager();
 
-    /**
-     * @brief Flag to allow or disallow multiple UI elements with the same name.
-     * If set to false (default), adding an element with an existing name will fail.
-     */
-    bool allowDuplicateNames = false; // Flag to allow multiple UI elements with the same name
-
-    template <DerivedFromUIElement2D T, typename... Args>
-    std::weak_ptr<T> Create(const std::string &name, Args &&...args)
+    template <DerivedFromScene T, typename... Args>
+    std::weak_ptr<T> CreateScene(const std::string &name, Args &&...args)
     {
+
       // Namenskonflikt abfangen
-      if (elementMap.contains(name))
+      if (scenes_.contains(name))
       {
         std::cerr << "[UIManager] Element with name '" << name << "' already exists!" << std::endl;
         return std::weak_ptr<T>{}; // empty weakpointer
       }
-      auto element = std::make_shared<T>(name, std::forward<Args>(args)...);
-      elementMap[name] = element;
-      elements.push_back(element);
-      AddDefaultBehaviors<T>(element);
-      return element;
+      auto scene = std::make_shared<T>(name, std::forward<Args>(args)...);
+      scenes_[name] = scene;
+      return scene;
+    }
+
+    template <DerivedFromScene T, typename... Args>
+    std::weak_ptr<T> CreateSceneAndSetAsActive(const std::string &name, Args &&...args)
+    {
+      auto scene = CreateScene<T>(name, std::forward<Args>(args)...);
+      if (auto sharedScene = scene.lock())
+      {
+        activeScene_ = sharedScene;
+      }
+      return scene;
     }
 
     template <DerivedFromUIElement2D T, typename... Args>
     std::weak_ptr<T> CreateChild(const std::string &name, const std::string &parentName, Args &&...args)
     {
+
+      auto scene = activeScene_.lock();
+      if (!scene)
+        return std::weak_ptr<T>{};
+
       // Namenskonflikt abfangen
-      if (elementMap.contains(name))
+      if (scene->GetElementsMap().contains(name))
       {
         std::cerr << "[UIManager] Element with name '" << name << "' already exists!" << std::endl;
         return std::weak_ptr<T>{}; // empty weakpointer
@@ -84,8 +96,9 @@ namespace LumidiGui
       }
 
       auto element = std::make_shared<T>(name, std::forward<Args>(args)...);
+      AddDefaultBehaviors<T>(element);
       parent->AddChild(element); // Add the new element as a child of the parent
-      elementMap[name] = element;
+      scene->GetElementsMap()[name] = element;
       return element;
     }
 
@@ -100,9 +113,14 @@ namespace LumidiGui
     template <DerivedFromUIElement2D T>
     std::weak_ptr<T> GetElementByNameAs(const std::string &name) const
     {
-      auto it = elementMap.find(name);
 
-      if (it == elementMap.end())
+      auto scene = activeScene_.lock();
+      if (!scene)
+        return std::weak_ptr<T>{}; // empty weakpointer
+
+      auto it = scene->GetElementsMap().find(name);
+
+      if (it == scene->GetElementsMap().end())
       {
         std::cerr << "[UIManager] Element with name '" << name << "' not found!" << std::endl;
         return std::weak_ptr<T>{}; // empty weakpointer
@@ -148,11 +166,17 @@ namespace LumidiGui
       return (RemoveElement(std::forward<Elements>(elements)) && ...);
     }
 
-    bool MoveChildToParent(const std::string &childName, const std::string &newParentName)
+    bool MoveChildToParent(const std::string &childName, const std::string &newParentName, const std::string &sceneName)
     {
+
+      auto it = scenes_.find(sceneName);
+      if (it == scenes_.end())
+        return false;
+      auto scene = it->second;
+
       auto child = GetElementByName(childName).lock();
-      ;
       auto newParent = GetElementByName(newParentName).lock();
+
       if (!child)
       {
         std::cerr << "[UIManager] Child element with name '" << childName << "' not found!" << std::endl;
@@ -171,12 +195,7 @@ namespace LumidiGui
       }
       else
       {
-        // If the child has no parent, we need to remove it from the to level elements vector
-        auto it = std::remove(elements.begin(), elements.end(), child);
-        if (it != elements.end())
-        {
-          elements.erase(it, elements.end());
-        }
+        return true; // child is root, can't be moved.
       }
 
       newParent->AddChild(child); // Add the child to the new parent'

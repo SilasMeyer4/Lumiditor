@@ -4,6 +4,7 @@
 #include "uiEvents.h"
 #include "uiColliders.h"
 #include "inputManager.h"
+#include "scene.h"
 
 int main(int, char **)
 {
@@ -12,8 +13,10 @@ int main(int, char **)
 
     LumidiGui::UIManager uiManager;
 
+    uiManager.CreateSceneAndSetAsActive<LumidiGui::Scene>("scene1");
+
     // BUTTON
-    uiManager.Create<LumidiGui::Button>("test", Vector2{350, 400}, Vector2{100, 50}, "Click Me");
+    uiManager.CreateChild<LumidiGui::Button>("test", "root", Vector2{350, 400}, Vector2{100, 50}, "Click Me");
     uiManager.GetElementByName("test").lock()->AddBehavior<LumidiGui::Events::ClickBehavior>(
         []()
         { std::cout << "Button clicked!" << std::endl; });
@@ -24,19 +27,19 @@ int main(int, char **)
 
     uiManager.GetElementByName("test").lock()->AddBehavior<LumidiGui::Events::DragBehavior>("default");
 
-    uiManager.Create<LumidiGui::Label>("label", Vector2{500, 500}, Vector2{150, 300}, "Label Wuu", 15, BLACK);
+    uiManager.CreateChild<LumidiGui::Label>("label", "root", Vector2{500, 500}, Vector2{150, 300}, "Label Wuu", 15, BLACK);
 
     uiManager.GetElementByName("label").lock()->AddBehavior<LumidiGui::Events::DragBehavior>("default");
 
     uiManager.GetElementByName("label").lock()->AddCollider<LumidiGui::RectangleCollider>("default");
 
-    uiManager.Create<LumidiGui::Rectangle>("rec", Vector2{350, 400}, Vector2{100, 50}, BLACK);
+    uiManager.CreateChild<LumidiGui::Rectangle>("rec", "root", Vector2{350, 400}, Vector2{100, 50}, BLACK);
 
     uiManager.GetElementByName("rec").lock()->AddCollider<LumidiGui::RectangleCollider>("default");
 
     uiManager.GetElementByName("rec").lock()->AddBehavior<LumidiGui::Events::DragBehavior>("default");
 
-    uiManager.Create<LumidiGui::Checkbox>("checkbox", Vector2{100, 100}, Vector2{30, 30}, true);
+    uiManager.CreateChild<LumidiGui::Checkbox>("checkbox", "root", Vector2{100, 100}, Vector2{30, 30}, true);
 
     while (!WindowShouldClose())
     {

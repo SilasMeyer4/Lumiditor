@@ -28,6 +28,10 @@ message(STATUS "lumidiGui source files: ${GUI_SRC}")
 find_package(raylib CONFIG REQUIRED)
 target_link_libraries(lumidiGui PUBLIC raylib)
 
+# lohman json binden
+find_package(nlohmann_json CONFIG REQUIRED)
+target_link_libraries(lumidiGui PRIVATE nlohmann_json::nlohmann_json)
+
 # ========================
 # TESTS
 # ========================
