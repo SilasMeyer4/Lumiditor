@@ -29,7 +29,7 @@ namespace LumidiGui
   concept StringLikeOrSharedPointerType = StringLike<T> || SharedPointerType<T>;
 
   template <typename T>
-  concept DerivedFromUIElement2D = std::derived_from<T, Element>;
+  concept DerivedFromUIElement = std::derived_from<T, Element>;
 
   template <typename T>
   concept RectangleType = std::same_as<T, LumidiGui::Rectangle>;

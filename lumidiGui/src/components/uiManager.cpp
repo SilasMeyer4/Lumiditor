@@ -14,7 +14,7 @@ namespace LumidiGui
 
     if (auto root = scene->GetRootElement().lock())
     {
-      if (root->isVisible)
+      if (root->IsVisible())
       {
         root->Update(inputManager);
       }
@@ -42,7 +42,7 @@ namespace LumidiGui
 
     if (!element->parent.lock())
     {
-      std::cerr << "[UIManager] Cannot remove root element '" << element->name << "'!" << std::endl;
+      std::cerr << "[UIManager] Cannot remove root element '" << element->GetName() << "'!" << std::endl;
       return false;
     }
 
@@ -51,7 +51,7 @@ namespace LumidiGui
       parent->RemoveChild(element);
     }
 
-    scene->GetElementsMap().erase(element->name);
+    scene->GetElementsMap().erase(element->GetName());
     return false;
   }
 
@@ -61,6 +61,8 @@ namespace LumidiGui
     if (it == scenes_.end())
       return nullptr;
     auto scene = it->second;
+
+    return scene;
   }
 
   UIManager::UIManager()
@@ -76,11 +78,41 @@ namespace LumidiGui
 
     if (auto root = scene->GetRootElement().lock())
     {
-      if (root->isVisible)
+      if (root->IsVisible())
       {
         root->Draw();
       }
     }
+  }
+
+  bool UIManager::ChangeElementName(const std::string &oldName, const std::string &newName, const std::string &sceneName)
+  {
+    auto weakElement = GetElementByName(oldName);
+    if (auto element = weakElement.lock())
+    {
+      auto it = scenes_.find(sceneName);
+      if (it != scenes_.end())
+      {
+        auto scene = it->second;
+        if (scene)
+        {
+          element->SetName(newName);
+          scene->GetElementsMap().erase(oldName);
+          scene->GetElementsMap()[newName] = element;
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  bool UIManager::ChangeElementName(const std::string &oldName, const std::string &newName)
+  {
+    if (auto scene = activeScene_.lock())
+    {
+      return ChangeElementName(oldName, newName, scene->GetName());
+    }
+    return false;
   }
 
   std::weak_ptr<Element> UIManager::GetElementByName(const std::string &name) const

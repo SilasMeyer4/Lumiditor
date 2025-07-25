@@ -8,7 +8,7 @@ namespace LumidiGui
 {
   namespace FluentAPI
   {
-    template <DerivedFromUIElement2D T>
+    template <DerivedFromUIElement T>
     class FluentHandlerUIElements : public FluentHandler<T>
     {
     private:
@@ -21,16 +21,41 @@ namespace LumidiGui
       using FluentHandler<T>::weakPtr_;
       FluentHandlerUIElements(std::weak_ptr<T> ptr) : FluentHandler<T>(ptr) {}
 
-      template <DerivedFromUIBehavior Behavior, typename... Args>
-      FluentHandlerUIElements<T> &AddBehavior(Args &&...args)
+      FluentHandlerUIElements<T> &SetVisible(bool visible)
       {
         if (auto ptr = LockAsBase())
         {
-          ptr->AddBehavior<Behavior>(std::forward<Args>(args)...);
+          ptr->SetVisible(visible);
         }
         else
         {
-          std::cerr << "[Fluent API] Warning: Element no longer exists." << std::endl;
+          std::cerr << "[Fluent API] Warning: Element no longer exists. Was not able to change visiblity.\n";
+        }
+        return *this;
+      }
+
+      FluentHandlerUIElements<T> &SetSize(Vector3 size)
+      {
+        if (auto ptr = LockAsBase())
+        {
+          ptr->SetSize(size);
+        }
+        else
+        {
+          std::cerr << "[Fluent API] Warning: Element no longer exists. Was not able to set size.\n";
+        }
+        return *this;
+      }
+
+      FluentHandlerUIElements<T> &SetPosition(Vector3 position)
+      {
+        if (auto ptr = LockAsBase())
+        {
+          ptr->SetPosition(position); // ruft Element::SetPosition auf
+        }
+        else
+        {
+          std::cerr << "[Fluent API] Warning: Element no longer exists. Was not able set position.\n";
         }
         return *this;
       }

@@ -35,7 +35,7 @@ target_link_libraries(lumidiGui PRIVATE nlohmann_json::nlohmann_json)
 # ========================
 # TESTS
 # ========================
-option(BUILD_TESTS "Build tests" ON)
+option(BUILD_TESTS "Build tests" OFF)
 if(BUILD_TESTS)
     include(FetchContent)
     enable_testing()

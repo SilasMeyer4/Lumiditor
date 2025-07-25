@@ -6,6 +6,8 @@
 #include "uiBehavior.h"
 #include "concepts.h"
 #include "inputManager.h"
+
+#include "fluentHandlerUIElements.h"
 #include <functional>
 #include <memory>
 #include <string>
@@ -15,13 +17,22 @@ namespace LumidiGui
 
   class Element : public std::enable_shared_from_this<Element>
   {
+    friend class UIManager;
+
   private:
     std::unordered_map<std::string, std::shared_ptr<Collider>> colliders_; // collider UI elements
     std::vector<std::shared_ptr<Events::UIBehavior>> behaviors_;           // behaviors for UI elements
     std::vector<std::shared_ptr<Element>> children_;                       // Children UI elements
+    FluentAPI::FluentHandlerUIElements<Element> ToFluent();
+    FluentAPI::FluentHandlerUIElements<Element> SetName(const std::string &name);
 
   protected:
     void DrawChildren() const;
+    Vector3 position_;
+    Vector3 size_; // Size of the UI element
+    bool isVisible_ = true;
+    bool isEnabled_ = true;
+    std::string name_;
 
   public:
     Element(std::string name, Vector3 position, Vector3 size);
@@ -37,7 +48,7 @@ namespace LumidiGui
     {
       if constexpr (sizeof...(Args) == 0)
       {
-        colliders_[label] = std::make_shared<ColliderType>(this->position, this->size);
+        colliders_[label] = std::make_shared<ColliderType>(this->position_, this->size_);
       }
       else
       {
@@ -46,7 +57,7 @@ namespace LumidiGui
     }
 
     std::shared_ptr<Collider> GetCollider(const std::string &label) const;
-    bool RenameCollider(const std::string &oldLabel, const std::string &newLabel);
+    FluentAPI::FluentHandlerUIElements<Element> RenameCollider(const std::string &oldLabel, const std::string &newLabel);
 
     template <DerivedFromUIBehavior BehaviorType, typename... Args>
     void AddBehavior(Args &&...args)
@@ -92,14 +103,19 @@ namespace LumidiGui
 
     std::shared_ptr<Element> GetChildByName(const std::string &name) const;
 
-    void ClearAllChildren();
+    FluentAPI::FluentHandlerUIElements<Element> ClearAllChildren();
 
-    Vector3 position;      // Position of the UI element
-    Vector3 size;          // Size of the UI element
-    bool isVisible = true; // Visibility of the UI element
-    bool isEnabled = true; // Enabled state of the UI element
-    int zIndex = 0;        // Z-index for rendering order
-    std::string name;
+    FluentAPI::FluentHandlerUIElements<Element> SetPosition(Vector3 position);
+    FluentAPI::FluentHandlerUIElements<Element> SetSize(Vector3 position);
+
+    FluentAPI::FluentHandlerUIElements<Element> SetEnabled(bool isEnabled);
+    FluentAPI::FluentHandlerUIElements<Element> SetVisible(bool isVisible);
+
+    Vector3 GetSize() const;
+    Vector3 GetPosition() const;
+    std::string GetName() const;
+    bool IsVisible() const;
+    bool IsEnabled() const;
   };
 }
 

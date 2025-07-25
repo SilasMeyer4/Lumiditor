@@ -2,18 +2,23 @@
 
 namespace LumidiGui
 {
+  FluentAPI::FluentHandlerUIElements<LumidiGui::Element> Element::ToFluent()
+  {
+    return FluentAPI::FluentHandlerUIElements<LumidiGui::Element>(shared_from_this());
+  }
+
   void Element::DrawChildren() const
   {
     for (const auto &child : children_)
     {
-      if (child->isVisible)
+      if (child->isVisible_)
       {
         child->Draw();
       }
     }
   }
 
-  Element::Element(std::string name, Vector3 position, Vector3 size) : name(name), position(position), size(size)
+  Element::Element(std::string name, Vector3 position, Vector3 size) : name_(name), position_(position), size_(size)
   {
   }
 
@@ -29,7 +34,7 @@ namespace LumidiGui
 
     for (auto &child : children_)
     {
-      if (child->isEnabled)
+      if (child->isEnabled_)
       {
         child->Update(inputManager);
       }
@@ -48,7 +53,7 @@ namespace LumidiGui
 
     for (auto &child : children_)
     {
-      if (child->isEnabled)
+      if (child->isEnabled_)
       {
         child->Render();
       }
@@ -129,25 +134,25 @@ namespace LumidiGui
     return nullptr;
   }
 
-  bool Element::RenameCollider(const std::string &oldLabel, const std::string &newLabel)
+  FluentAPI::FluentHandlerUIElements<Element> Element::RenameCollider(const std::string &oldLabel, const std::string &newLabel)
   {
     auto it = colliders_.find(oldLabel);
     if (it == colliders_.end())
-      return false;
+      return ToFluent();
     if (colliders_.count(newLabel) > 0)
-      return false;
+      return ToFluent();
 
     auto collider = it->second;
     colliders_.erase(it);
     colliders_[newLabel] = collider;
-    return true;
+    return ToFluent();
   }
 
   std::shared_ptr<Element> Element::GetChildByName(const std::string &name) const
   {
     for (const auto &child : children_)
     {
-      if (child->name == name)
+      if (child->name_ == name)
       {
         return child;
       }
@@ -166,7 +171,7 @@ namespace LumidiGui
     {
       if (existingParent.get() == this)
       {
-        return false; // Child already has this element as a parent
+        return true; // Child already has this element as a parent
       }
 
       existingParent->RemoveChild(child); // Remove from previous parent
@@ -176,12 +181,60 @@ namespace LumidiGui
     children_.push_back(child);
     return true;
   }
-  void Element::ClearAllChildren()
+  FluentAPI::FluentHandlerUIElements<Element> Element::ClearAllChildren()
   {
     for (auto &child : children_)
     {
       child->parent.reset(); // Clear the parent reference for each child
     }
     children_.clear();
+    return ToFluent();
+  }
+  FluentAPI::FluentHandlerUIElements<Element> Element::SetPosition(Vector3 position)
+  {
+    this->position_ = position;
+    return ToFluent();
+  }
+  FluentAPI::FluentHandlerUIElements<Element> Element::SetSize(Vector3 position)
+  {
+    this->position_ = position;
+    return ToFluent();
+  }
+
+  FluentAPI::FluentHandlerUIElements<Element> Element::SetName(const std::string &name)
+  {
+    this->name_ = name;
+    return ToFluent();
+  }
+  FluentAPI::FluentHandlerUIElements<Element> Element::SetEnabled(bool isEnabled)
+  {
+    this->isEnabled_ = isEnabled;
+    return ToFluent();
+  }
+  FluentAPI::FluentHandlerUIElements<Element> Element::SetVisible(bool isVisible)
+  {
+    this->isVisible_ = isVisible;
+    return ToFluent();
+  }
+  Vector3 Element::GetSize() const
+  {
+    return this->size_;
+  }
+
+  Vector3 Element::GetPosition() const
+  {
+    return this->position_;
+  }
+  std::string Element::GetName() const
+  {
+    return this->name_;
+  }
+  bool Element::IsVisible() const
+  {
+    return this->isVisible_;
+  }
+  bool Element::IsEnabled() const
+  {
+    return this->isEnabled_;
   }
 }

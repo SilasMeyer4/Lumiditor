@@ -6,7 +6,7 @@ void LumidiGui::Rectangle::Draw() const
 {
   Vector2 originPoint = {0, 0};
 
-  ::Rectangle rec = {this->position.x, this->position.y, this->size.x, this->size.y};
+  ::Rectangle rec = {this->position_.x, this->position_.y, this->size_.x, this->size_.y};
 
   if (isFilled)
   {

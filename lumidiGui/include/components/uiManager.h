@@ -25,14 +25,15 @@ namespace LumidiGui
     std::weak_ptr<Scene> activeScene_;
     std::unordered_map<std::string, std::shared_ptr<Scene>> scenes_; // Vector to hold UI elements
     std::unordered_map<std::type_index, std::vector<std::function<void(std::shared_ptr<LumidiGui::Element>)>>> defaultBehaviorsRegistry_;
+    // std::unordered_map<std::type_index, std::vector<std::function<void(std::shared_ptr<LumidiGui::Element>)>>> defaultCollidersRegistry_;
     bool RemoveElement(std::shared_ptr<Element> element);
 
     std::shared_ptr<Scene> GetScene(const std::string &sceneName) const;
 
-    template <typename UIElementT>
-    void AddDefaultBehaviors(std::shared_ptr<UIElementT> element)
+    template <DerivedFromUIElement ElementT>
+    void AddDefaultBehaviors(std::shared_ptr<ElementT> element)
     {
-      auto it = defaultBehaviorsRegistry_.find(typeid(UIElementT));
+      auto it = defaultBehaviorsRegistry_.find(typeid(ElementT));
       if (it != defaultBehaviorsRegistry_.end())
       {
         for (auto &factory : it->second)
@@ -41,6 +42,19 @@ namespace LumidiGui
         }
       }
     }
+
+    // template <DerivedFromUIElement ElementT>
+    // void AddDefaultColliders(std::shared_ptr<ElementT> element)
+    // {
+    //   auto it = defaultCollidersRegistry_.find(typeid(ElementT));
+    //   if (it != defaultCollidersRegistry_.end())
+    //   {
+    //     for (auto &factory : it->second)
+    //     {
+    //       factory(element);
+    //     }
+    //   }
+    // }
 
   public:
     // Constructor
@@ -72,7 +86,7 @@ namespace LumidiGui
       return scene;
     }
 
-    template <DerivedFromUIElement2D T, typename... Args>
+    template <DerivedFromUIElement T, typename... Args>
     std::weak_ptr<T> CreateChild(const std::string &name, const std::string &parentName, Args &&...args)
     {
 
@@ -96,11 +110,15 @@ namespace LumidiGui
       }
 
       auto element = std::make_shared<T>(name, std::forward<Args>(args)...);
+      // AddDefaultColliders<T>(element);
       AddDefaultBehaviors<T>(element);
       parent->AddChild(element); // Add the new element as a child of the parent
       scene->GetElementsMap()[name] = element;
       return element;
     }
+
+    bool ChangeElementName(const std::string &oldName, const std::string &newName, const std::string &sceneName);
+    bool ChangeElementName(const std::string &oldName, const std::string &newName);
 
     /**
      * @brief Retrieves a UI element by its name.
@@ -110,7 +128,7 @@ namespace LumidiGui
      */
     std::weak_ptr<Element> GetElementByName(const std::string &name) const;
 
-    template <DerivedFromUIElement2D T>
+    template <DerivedFromUIElement T>
     std::weak_ptr<T> GetElementByNameAs(const std::string &name) const
     {
 

@@ -8,7 +8,7 @@ namespace LumidiGui
   }
   void Label::Draw() const
   {
-    DrawText(this->text.c_str(), this->position.x, this->position.y, this->fontSize, this->foregroundColor);
+    DrawText(this->text.c_str(), this->position_.x, this->position_.y, this->fontSize, this->foregroundColor);
     DrawChildren();
   }
 }

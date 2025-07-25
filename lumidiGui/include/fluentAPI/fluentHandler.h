@@ -2,7 +2,6 @@
 #define LUMIDIGUI_FLUENTAPI_FLUENT_HANDLER_H
 
 #include <memory>
-#include "uiComponents.h"
 
 namespace LumidiGui
 {
