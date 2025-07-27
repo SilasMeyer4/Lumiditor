@@ -7,18 +7,18 @@
 
 namespace LumidiGui
 {
-  class UIElement2D;
+  class Element;
   namespace Events
   {
 
     class UIBehavior
     {
     protected:
-      std::weak_ptr<UIElement2D> parent_;
+      std::weak_ptr<Element> parent_;
 
     public:
       virtual void Update(InputManager &inputManager) = 0;
-      UIBehavior(std::weak_ptr<UIElement2D> parent) : parent_(parent) {}
+      UIBehavior(std::weak_ptr<Element> parent) : parent_(parent) {}
       virtual void Render() {}
       virtual ~UIBehavior() = default;
       bool isEnabled = true;

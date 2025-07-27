@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "license": "MIT",
   "dependencies": [
-    "raylib"
+    "raylib",
+    "nlohmann-json",
+    "sol2",
+    "lua"
   ]
 }

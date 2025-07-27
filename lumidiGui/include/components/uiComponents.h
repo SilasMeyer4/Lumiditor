@@ -1,14 +1,15 @@
 #ifndef LUMIDI_GUI_COMPONENTS_H
 #define LUMIDI_GUI_COMPONENTS_H
 
-#include "button.h"
-#include "slider.h"
-#include "uiElement2D.h"
+#include "2D/button.h"
+#include "2D/border.h"
+#include "2D/slider.h"
+#include "2D/element2D.h"
 #include "uiManager.h"
-#include "panel.h"
-#include "label.h"
-#include "rectangle.h"
-#include "line.h"
-#include "checkbox.h"
+#include "2D/panel.h"
+#include "2D/label.h"
+#include "2D/rectangle.h"
+#include "2D/line.h"
+#include "2D/checkbox.h"
 
 #endif // LUMIDI_GUI_COMPONENTS_H

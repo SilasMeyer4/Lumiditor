@@ -2,7 +2,7 @@
 #define LUMIDITOR_RECTANGLE_H
 
 #include "raylib.h"
-#include "uiElement2D.h"
+#include "element2D.h"
 
 namespace LumidiGui
 {
@@ -14,14 +14,14 @@ namespace LumidiGui
     int segments = 0;
     Color color = BLACK;
   };
-  class Rectangle : public UIElement2D
+  class Rectangle : public Element2D
   {
   private:
     float rotation_ = 0.f;
 
   public:
     Rectangle(std::string name, Vector2 position, Vector2 size, Color color)
-        : UIElement2D(name, position, size), color(color) {}
+        : Element2D(name, position, size), color(color) {}
 
     Rectangle(std::string name, Vector2 position, Vector2 size, Color color, Border border)
         : Rectangle(name, position, size, color)
@@ -50,6 +50,7 @@ namespace LumidiGui
       hasBorder = true;
     }
 
+    ElementType GetType() const override { return ElementType::Rectangle; }
     void SetRotation(float rotation);
     float GetRotation() const;
     bool hasBorder = false;

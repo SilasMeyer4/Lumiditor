@@ -5,11 +5,11 @@
 #include "uiManager.h"
 
 // Mock für UIElement2D
-class MockUIElement2D : public LumidiGui::UIElement2D
+class MockUIElement2D : public LumidiGui::Element
 {
 public:
   MockUIElement2D(const std::string &n, Vector2 pos = {0, 0}, Vector2 size = {0, 0})
-      : UIElement2D(n, pos, size) {}
+      : Element(n, pos, size) {}
 
   MOCK_METHOD(void, Draw, (), (const, override));
   MOCK_METHOD(void, Update, (Vector2, bool), (override));

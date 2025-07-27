@@ -1,4 +1,4 @@
-#include "UIManager.h"
+#include "uiManager.h"
 #include <iostream>
 #include "defaultBehaviors.h"
 
@@ -8,11 +8,15 @@ namespace LumidiGui
   void UIManager::Update(InputManager &inputManager)
   {
 
-    for (const auto &element : elements)
+    auto scene = UIManager::activeScene_.lock();
+    if (!scene)
+      return;
+
+    if (auto root = scene->GetRootElement().lock())
     {
-      if (element->isEnabled)
+      if (root->IsVisible())
       {
-        element->Update(inputManager);
+        root->Update(inputManager);
       }
     }
   }
@@ -27,35 +31,38 @@ namespace LumidiGui
     return false; // Return false if the element was not found
   }
 
-  bool UIManager::RemoveElement(std::shared_ptr<UIElement2D> element)
+  bool UIManager::RemoveElement(std::shared_ptr<Element> element)
   {
     if (!element)
       return false;
 
-    elementMap.erase(element->name);
+    auto scene = UIManager::activeScene_.lock();
+    if (!scene)
+      return false;
 
-    if (element->parent.expired())
+    if (!element->parent.lock())
     {
-      auto it = std::remove_if(elements.begin(), elements.end(),
-                               [&](const auto &el)
-                               { return el == element; });
-
-      if (it != elements.end())
-      {
-        elements.erase(it, elements.end());
-        return true;
-      }
-    }
-    else
-    {
-      if (auto parent = element->parent.lock())
-      {
-        parent->RemoveChild(element);
-        return true; // Element was removed from its parent
-      }
+      std::cerr << "[UIManager] Cannot remove root element '" << element->GetName() << "'!" << std::endl;
+      return false;
     }
 
+    if (auto parent = element->parent.lock())
+    {
+      parent->RemoveChild(element);
+    }
+
+    scene->GetElementsMap().erase(element->GetName());
     return false;
+  }
+
+  std::shared_ptr<Scene> UIManager::GetScene(const std::string &sceneName) const
+  {
+    auto it = scenes_.find(sceneName);
+    if (it == scenes_.end())
+      return nullptr;
+    auto scene = it->second;
+
+    return scene;
   }
 
   UIManager::UIManager()
@@ -65,18 +72,56 @@ namespace LumidiGui
 
   void UIManager::Draw() const
   {
-    for (const auto &element : elements)
+    auto scene = UIManager::activeScene_.lock();
+    if (!scene)
+      return;
+
+    if (auto root = scene->GetRootElement().lock())
     {
-      if (element->isVisible)
+      if (root->IsVisible())
       {
-        element->Draw();
+        root->Draw();
       }
     }
   }
 
-  std::weak_ptr<UIElement2D> UIManager::GetElementByName(const std::string &name) const
+  bool UIManager::ChangeElementName(const std::string &oldName, const std::string &newName, const std::string &sceneName)
   {
-    auto it = elementMap.find(name);
-    return (it != elementMap.end()) ? it->second : std::weak_ptr<UIElement2D>{};
+    auto weakElement = GetElementByName(oldName);
+    if (auto element = weakElement.lock())
+    {
+      auto it = scenes_.find(sceneName);
+      if (it != scenes_.end())
+      {
+        auto scene = it->second;
+        if (scene)
+        {
+          element->SetName(newName);
+          scene->GetElementsMap().erase(oldName);
+          scene->GetElementsMap()[newName] = element;
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  bool UIManager::ChangeElementName(const std::string &oldName, const std::string &newName)
+  {
+    if (auto scene = activeScene_.lock())
+    {
+      return ChangeElementName(oldName, newName, scene->GetName());
+    }
+    return false;
+  }
+
+  std::weak_ptr<Element> UIManager::GetElementByName(const std::string &name) const
+  {
+    auto scene = UIManager::activeScene_.lock();
+    if (!scene)
+      return std::weak_ptr<Element>{};
+
+    auto it = scene->GetElementsMap().find(name);
+    return (it != scene->GetElementsMap().end()) ? it->second : std::weak_ptr<Element>{};
   }
 }

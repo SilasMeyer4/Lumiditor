@@ -5,7 +5,7 @@
 #include <functional>
 
 #include "uiBehavior.h"
-#include "uiElement2D.h"
+#include "element.h"
 #include "inputManager.h"
 
 namespace LumidiGui
@@ -16,10 +16,11 @@ namespace LumidiGui
     {
     private:
       bool isDragging_ = false; // Track if the button was clicked
+      std::string colliderLabel_;
 
     public:
-      DragBehavior(std::weak_ptr<UIElement2D> parent)
-          : UIBehavior(parent) {}
+      DragBehavior(std::weak_ptr<Element> parent, std::string colliderLabel)
+          : UIBehavior(parent), colliderLabel_(colliderLabel) {}
 
       void Update(InputManager &inputManager) override;
     };

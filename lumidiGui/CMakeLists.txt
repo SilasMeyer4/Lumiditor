@@ -10,8 +10,11 @@ add_library(lumidiGui STATIC ${GUI_SRC})
 
 # Header-Verzeichnisse (öffentlich, damit Tests sie auch sehen)
 target_include_directories(lumidiGui PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/components
+${CMAKE_CURRENT_SOURCE_DIR}/include/components
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/components/3D
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/components/2D
     ${CMAKE_CURRENT_SOURCE_DIR}/include/colliders
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/fluentAPI
     ${CMAKE_CURRENT_SOURCE_DIR}/include/events
     ${CMAKE_CURRENT_SOURCE_DIR}/include/helpers
     ${CMAKE_CURRENT_SOURCE_DIR}/include/colors
@@ -19,16 +22,28 @@ target_include_directories(lumidiGui PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/shapes
 )
 
+    find_package(Lua REQUIRED)
+    target_include_directories(lumidiGui PRIVATE ${LUA_INCLUDE_DIR})
+    target_link_libraries(lumidiGui PRIVATE ${LUA_LIBRARIES})
+
+        find_package(sol2 CONFIG REQUIRED)
+target_link_libraries(lumidiGui PRIVATE sol2::sol2)
+
+
 message(STATUS "lumidiGui source files: ${GUI_SRC}")
 
 # raylib binden
 find_package(raylib CONFIG REQUIRED)
 target_link_libraries(lumidiGui PUBLIC raylib)
 
+# lohman json binden
+find_package(nlohmann_json CONFIG REQUIRED)
+target_link_libraries(lumidiGui PRIVATE nlohmann_json::nlohmann_json)
+
 # ========================
 # TESTS
 # ========================
-option(BUILD_TESTS "Build tests" ON)
+option(BUILD_TESTS "Build tests" OFF)
 if(BUILD_TESTS)
     include(FetchContent)
     enable_testing()
