@@ -7,10 +7,6 @@
 #include <memory>
 #include "nlohmann/json.hpp"
 #include "uiComponents.h"
-extern "C"
-{
-#include "sol"
-}
 
 namespace LumidiGui
 {
@@ -93,6 +89,21 @@ namespace LumidiGui
 
       json SerializeBehaviors(const std::vector<std::shared_ptr<Events::UIBehavior>> &behaviors)
       {
+        json j;
+        for (auto behavior : behaviors)
+        {
+          j.push_back(SerializeBehavior(behavior));
+        }
+        return j;
+      }
+
+      json SerializeBehavior(const std::shared_ptr<Events::UIBehavior> &behaviors)
+      {
+        json j;
+        j["type"] = behaviors.GetType();
+        j["enabled"] = behaviors->isEnabled();
+        // TODO how to serialize the lua functions
+        return j;
       }
     };
   }

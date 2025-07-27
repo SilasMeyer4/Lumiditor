@@ -8,9 +8,9 @@ void LumidiGui::Events::HoverBehavior::Update(InputManager &inputManager)
     if (!isHovering_)
     {
       isHovering_ = true;
-      if (onHoverEnter_)
+      if (luaOnHoverEnter_.valid())
       {
-        onHoverEnter_();
+        luaOnHoverEnter_();
       }
     }
   }
@@ -19,9 +19,9 @@ void LumidiGui::Events::HoverBehavior::Update(InputManager &inputManager)
     if (isHovering_)
     {
       isHovering_ = false;
-      if (onHoverLeave_)
+      if (luaOnHoverLeave_.valid())
       {
-        onHoverLeave_();
+        luaOnHoverLeave_();
       }
     }
   }

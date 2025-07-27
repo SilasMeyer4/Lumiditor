@@ -33,12 +33,6 @@ int main(int, char **)
 
     uiManager.GetElementByName("label").lock()->AddCollider<LumidiGui::RectangleCollider>("default");
 
-    uiManager.CreateChild<LumidiGui::Rectangle>("rec", "root", Vector2{350, 400}, Vector2{100, 50}, BLACK);
-
-    uiManager.GetElementByName("rec").lock()->AddCollider<LumidiGui::RectangleCollider>("default");
-
-    uiManager.GetElementByName("rec").lock()->AddBehavior<LumidiGui::Events::DragBehavior>("default");
-
     uiManager.CreateChild<LumidiGui::Checkbox>("checkbox", "root", Vector2{100, 100}, Vector2{30, 30}, true);
 
     while (!WindowShouldClose())

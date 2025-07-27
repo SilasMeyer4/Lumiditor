@@ -7,9 +7,9 @@ void LumidiGui::Events::ClickBehavior::Update(InputManager &inputManager)
     Vector2 mousePosition = inputManager.GetInstance().GetMouseInput().position;
     if (auto p = parent_.lock(); p && p->ContainsPoint("default", mousePosition))
     {
-      if (onClick_)
+      if (luaOnClick_.valid())
       {
-        onClick_();
+        luaOnClick_();
         this->isClicked_ = true;
       }
     }

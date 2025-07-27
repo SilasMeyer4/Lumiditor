@@ -16,7 +16,7 @@ namespace LumidiGui
     Collider(const Vector2 &position, const Vector2 &size)
     {
       this->position = Vector3{position.x, position.y, 0};
-      this->size = Vector3{position.x, position.y};
+      this->size = Vector3{size.x, size.y};
     }
     virtual bool Contains(const Vector2 &point) const = 0;
     virtual bool Contains(const Vector3 &point) const = 0;

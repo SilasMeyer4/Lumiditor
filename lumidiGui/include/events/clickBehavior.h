@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <functional>
-
+#include "luaManager.h"
 #include "uiBehavior.h"
 #include "element.h"
 
@@ -14,12 +14,17 @@ namespace LumidiGui
     class ClickBehavior : public UIBehavior
     {
     private:
-      std::function<void()> onClick_;
-      bool isClicked_ = false; // Track if the button was clicked
+      sol::function luaOnClick_;
+      bool isClicked_ = false;
 
     public:
       ClickBehavior(std::weak_ptr<Element> parent, std::function<void()> onClick)
-          : UIBehavior(parent), onClick_(std::move(onClick)) {}
+          : UIBehavior(parent)
+      {
+        auto &lua = LumidiGui::LuaManager::Instance().Lua();
+        lua["onClick"] = onClick;
+        luaOnClick_ = lua["onClick"];
+      }
 
       void Update(InputManager &inputManager) override;
     };
