@@ -16,6 +16,7 @@ namespace LumidiGui
 
     ~Line() = default;
     void Draw() const override;
+    ElementType GetType() const override { return ElementType::Line; }
     Color color = BLACK;
     float width;
   };

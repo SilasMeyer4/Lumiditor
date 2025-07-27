@@ -2,11 +2,6 @@
 
 namespace LumidiGui
 {
-  FluentAPI::FluentHandlerUIElements<LumidiGui::Element> Element::ToFluent()
-  {
-    return FluentAPI::FluentHandlerUIElements<LumidiGui::Element>(shared_from_this());
-  }
-
   void Element::DrawChildren() const
   {
     for (const auto &child : children_)
@@ -101,26 +96,27 @@ namespace LumidiGui
     DrawChildren();
   }
 
-  bool Element::RemoveChild(std::shared_ptr<Element> child)
+  Element &Element::RemoveChild(std::shared_ptr<Element> child)
   {
     auto it = std::remove(children_.begin(), children_.end(), child);
     if (it != children_.end())
     {
       children_.erase(it, children_.end());
       child->parent.reset();
-      return true;
+      return *this;
     }
-    return false;
+    return *this;
   }
 
-  bool Element::RemoveChild(const std::string &name)
+  Element &Element::RemoveChild(const std::string &name)
   {
     auto child = GetChildByName(name);
     if (child)
     {
       return RemoveChild(child);
     }
-    return false; // Return false if no child with the given name is found
+    std::cerr << "[Element-" << this->name_ << "]: Doesn't have a child with the name: " << name << "\n";
+    return *this; // Return false if no child with the given name is found
   }
 
   std::shared_ptr<Collider> Element::GetCollider(const std::string &label) const
@@ -134,18 +130,23 @@ namespace LumidiGui
     return nullptr;
   }
 
-  FluentAPI::FluentHandlerUIElements<Element> Element::RenameCollider(const std::string &oldLabel, const std::string &newLabel)
+  std::unordered_map<std::string, std::shared_ptr<Collider>> &Element::GetColliders()
+  {
+    return colliders_;
+  }
+
+  Element &Element::RenameCollider(const std::string &oldLabel, const std::string &newLabel)
   {
     auto it = colliders_.find(oldLabel);
     if (it == colliders_.end())
-      return ToFluent();
+      return *this;
     if (colliders_.count(newLabel) > 0)
-      return ToFluent();
+      return *this;
 
     auto collider = it->second;
     colliders_.erase(it);
     colliders_[newLabel] = collider;
-    return ToFluent();
+    return *this;
   }
 
   std::shared_ptr<Element> Element::GetChildByName(const std::string &name) const
@@ -160,18 +161,18 @@ namespace LumidiGui
     return nullptr; // Return nullptr if no child with the given name is found
   }
 
-  bool Element::AddChild(std::shared_ptr<Element> child)
+  Element &Element::AddChild(std::shared_ptr<Element> child)
   {
     if (!child)
     {
-      return false;
+      return *this;
     }
 
     if (auto existingParent = child->parent.lock())
     {
       if (existingParent.get() == this)
       {
-        return true; // Child already has this element as a parent
+        return *this; // Child already has this element as a parent
       }
 
       existingParent->RemoveChild(child); // Remove from previous parent
@@ -179,42 +180,42 @@ namespace LumidiGui
 
     child->parent = weak_from_this(); // Set this element as the new parent
     children_.push_back(child);
-    return true;
+    return *this;
   }
-  FluentAPI::FluentHandlerUIElements<Element> Element::ClearAllChildren()
+  Element &Element::ClearAllChildren()
   {
     for (auto &child : children_)
     {
       child->parent.reset(); // Clear the parent reference for each child
     }
     children_.clear();
-    return ToFluent();
+    return *this;
   }
-  FluentAPI::FluentHandlerUIElements<Element> Element::SetPosition(Vector3 position)
+  Element &Element::SetPosition(Vector3 position)
   {
     this->position_ = position;
-    return ToFluent();
+    return *this;
   }
-  FluentAPI::FluentHandlerUIElements<Element> Element::SetSize(Vector3 position)
+  Element &Element::SetSize(Vector3 position)
   {
     this->position_ = position;
-    return ToFluent();
+    return *this;
   }
 
-  FluentAPI::FluentHandlerUIElements<Element> Element::SetName(const std::string &name)
+  Element &Element::SetName(const std::string &name)
   {
     this->name_ = name;
-    return ToFluent();
+    return *this;
   }
-  FluentAPI::FluentHandlerUIElements<Element> Element::SetEnabled(bool isEnabled)
+  Element &Element::SetEnabled(bool isEnabled)
   {
     this->isEnabled_ = isEnabled;
-    return ToFluent();
+    return *this;
   }
-  FluentAPI::FluentHandlerUIElements<Element> Element::SetVisible(bool isVisible)
+  Element &Element::SetVisible(bool isVisible)
   {
     this->isVisible_ = isVisible;
-    return ToFluent();
+    return *this;
   }
   Vector3 Element::GetSize() const
   {

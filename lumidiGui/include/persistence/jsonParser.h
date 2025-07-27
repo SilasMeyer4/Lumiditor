@@ -7,6 +7,10 @@
 #include <memory>
 #include "nlohmann/json.hpp"
 #include "uiComponents.h"
+extern "C"
+{
+#include "sol"
+}
 
 namespace LumidiGui
 {
@@ -16,85 +20,81 @@ namespace LumidiGui
     using json = nlohmann::json;
     using JsonSerializeFunction = std::function<json(const std::shared_ptr<LumidiGui::Element> &)>;
 
-    class JsonSerializerRegistry
+    class JsonSerializer
     {
+    private:
+      std::string version_ = "0.1.0";
+      std::string format_ = "LumidiGui";
+
     public:
-      static JsonSerializerRegistry &Instance()
+      static JsonSerializer &Instance()
       {
-        static JsonSerializerRegistry instance;
+        static JsonSerializer instance;
         return instance;
       }
 
-      void Register(const std::string &typeName, JsonSerializeFunction func)
+      void SerializeScene(const std::shared_ptr<Scene> &scene, const std::string &filePath, const std::string &description = "")
       {
-        registry_[typeName] = std::move(func);
+        auto rootElement = scene->GetRootElement().lock();
+        if (!rootElement)
+          throw std::runtime_error("[JsonParser]: Scene has no root element");
+
+        json j;
+        j["format"] = format_;
+        j["version"] = version_;
+        j["scene"]["name"] = description;
+        j["scene"]["description"] = description;
+        j["scene"]["rootElement"] = rootElement->GetName();
+        j["scene"]["elementsMap"] = SerializeElementsMap(scene->GetElementsMap());
       }
 
-      json Serialize(const std::string &typeName, const std::shared_ptr<LumidiGui::Element> &elem)
+      json SerializeElementsMap(const std::unordered_map<std::string, std::weak_ptr<Element>> &elementsMap)
       {
-        auto it = registry_.find(typeName);
-        if (it != registry_.end())
+        json j;
+        for (auto entry : elementsMap)
         {
-          return it->second(elem);
+          if (auto element = entry.second.lock())
+          {
+            j[element->GetName()] = SerializeElement(element);
+          }
+          else
+          {
+            std::cerr << "[JsonParser]: Element with name " << entry.first << " is not found\n";
+          }
         }
-        // Fallback
-        return DefaultSerialize(elem);
-      }
-
-      // Serialisierung mit RTTI - hole Typ aus shared_ptr und rufe Serialize auf
-      json Serialize(const std::shared_ptr<LumidiGui::Element> &elem)
-      {
-        if (!elem)
-          return json();
-        return Serialize(typeid(*elem).name(), elem);
-      }
-
-    private:
-      std::unordered_map<std::string, JsonSerializeFunction> registry_;
-
-      static json DefaultSerialize(const std::shared_ptr<LumidiGui::Element> &elem)
-      {
-        json j = SerializeBaseElement(elem);
         return j;
       }
-    };
 
-    // Beispiel-Helper zum Registrieren
-    template <typename T>
-    struct JsonSerializerRegister
-    {
-      JsonSerializerRegister()
+      json SerializeElement(const std::shared_ptr<LumidiGui::Element> &element)
       {
-        JsonSerializerRegistry::Instance().Register(typeid(T).name(),
-                                                    [](const std::shared_ptr<LumidiGui::Element> &elem) -> json
-                                                    {
-                                                      auto casted = std::dynamic_pointer_cast<T>(elem);
-                                                      if (casted)
-                                                      {
-                                                        return SerializeSpecific(casted);
-                                                      }
-                                                      return json();
-                                                    });
+        json j;
+        j["name"] = element->GetName();
+        j["type"] = element->GetType();
+
+        j["position"] = json{{"x", element->GetPosition().x}, {"y", element->GetPosition().y}, {"z", element->GetPosition().z}};
+        j["size"] = json{{"x", element->GetSize().x}, {"y", element->GetSize().y}, {"z", element->GetSize().z}};
+        j["isVisible"] = element->IsVisible();
+        j["isEnabled"] = element->IsEnabled();
+        j["children"] = SerializeChildren(element->GetChildren());
+        j["behaviors"] = SerializeBehaviors(element->GetBehaviors());
+        j["colliders"] = SerializeColliders(element->GetColliders());
+        return j;
+      }
+
+      json SerializeChildren(const std::vector<std::shared_ptr<LumidiGui::Element>> &children)
+      {
+        json j;
+        for (auto child : children)
+        {
+          j.push_back(SerializeElement(child));
+        }
+        return j;
+      }
+
+      json SerializeBehaviors(const std::vector<std::shared_ptr<Events::UIBehavior>> &behaviors)
+      {
       }
     };
-
-    json SerializeSpecific(const std::shared_ptr<LumidiGui::Button> &button)
-    {
-      json j = SerializeBaseElement(button);
-      j["type"] = "Button";
-      j["name"] = button->name;
-      // ... button-spezifische Daten
-      return j;
-    }
-
-    json SerializeBaseElement(const std::shared_ptr<LumidiGui::Element> &elem)
-    {
-      return JsonSerializerRegistry::Instance().Serialize(typeid(LumidiGui::Element).name(), elem);
-    }
-
-    static JsonSerializerRegister<LumidiGui::Button> registerButton;
-    static JsonSerializerRegister<LumidiGui::Element> registerElement;
-
   }
 }
 

@@ -50,6 +50,7 @@ namespace LumidiGui
       hasBorder = true;
     }
 
+    ElementType GetType() const override { return ElementType::Rectangle; }
     void SetRotation(float rotation);
     float GetRotation() const;
     bool hasBorder = false;

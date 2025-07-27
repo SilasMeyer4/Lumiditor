@@ -1,0 +1,43 @@
+# .github/workflows/discord-notify.yml
+name: Notify Discord
+
+on:
+  push:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Format commit list and send to Discord
+        run: |
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          COMMITS_JSON=$(echo '${{ toJson(github.event.commits) }}')
+
+          MESSAGE="**Branch:** ${BRANCH_NAME}\n"
+          MESSAGE+="**Pushed by:** ${{ github.actor }}\n"
+          MESSAGE+="**Commits:**\n"
+
+          COUNT=$(echo "$COMMITS_JSON" | jq length)
+
+          for i in $(seq 0 $((COUNT - 1))); do
+            SHA=$(echo "$COMMITS_JSON" | jq -r ".[$i].id" | cut -c1-7)
+            URL=$(echo "$COMMITS_JSON" | jq -r ".[$i].url")
+            MSG=$(echo "$COMMITS_JSON" | jq -r ".[$i].message" | head -n 1)
+            AUTHOR=$(echo "$COMMITS_JSON" | jq -r ".[$i].author.name")
+            
+            MESSAGE+="- [\`${SHA}\`](${URL}) by **${AUTHOR}**: ${MSG}\n"
+          done
+
+          # Escape double quotes
+          MESSAGE_ESCAPED=$(echo "$MESSAGE" | sed 's/"/\\"/g')
+
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{
+                 \"embeds\": [{
+                   \"title\": \"GitHub Push Notification\",
+                   \"description\": \"${MESSAGE_ESCAPED}\",
+                   \"color\": 3447003
+                 }]
+               }" \
+               ${{ secrets.DISCORD_COMMIT }}

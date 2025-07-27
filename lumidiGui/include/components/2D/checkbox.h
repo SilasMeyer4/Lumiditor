@@ -36,7 +36,7 @@ namespace LumidiGui
     ~Checkbox() = default;
 
     void Draw() const override;
-
+    ElementType GetType() const override { return ElementType::Checkbox; }
     bool isChecked = false;
 
     template <RectangleType T, typename... Args>

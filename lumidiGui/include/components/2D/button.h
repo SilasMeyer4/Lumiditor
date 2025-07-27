@@ -16,7 +16,7 @@ namespace LumidiGui
     Button(std::string name, Vector2 position, Vector2 size, std::string text = "Button");
     ~Button();
     void Draw() const override;
-
+    ElementType GetType() const override { return ElementType::Button; }
     // Properties
     std::string text;              // Text displayed on the button
     Color foregroundColor = BLACK; // Color of the button

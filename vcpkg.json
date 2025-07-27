@@ -4,6 +4,8 @@
   "license": "MIT",
   "dependencies": [
     "raylib",
-    "nlohmann-json"
+    "nlohmann-json",
+    "sol2",
+    "lua"
   ]
 }

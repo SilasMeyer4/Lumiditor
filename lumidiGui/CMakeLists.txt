@@ -22,6 +22,14 @@ ${CMAKE_CURRENT_SOURCE_DIR}/include/components
     ${CMAKE_CURRENT_SOURCE_DIR}/include/shapes
 )
 
+    find_package(Lua REQUIRED)
+    target_include_directories(lumidiGui PRIVATE ${LUA_INCLUDE_DIR})
+    target_link_libraries(lumidiGui PRIVATE ${LUA_LIBRARIES})
+
+        find_package(sol2 CONFIG REQUIRED)
+target_link_libraries(lumidiGui PRIVATE sol2::sol2)
+
+
 message(STATUS "lumidiGui source files: ${GUI_SRC}")
 
 # raylib binden

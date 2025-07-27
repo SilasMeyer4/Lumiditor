@@ -7,13 +7,24 @@
 #include "concepts.h"
 #include "inputManager.h"
 
-#include "fluentHandlerUIElements.h"
 #include <functional>
 #include <memory>
 #include <string>
 
 namespace LumidiGui
 {
+
+  enum class ElementType
+  {
+    Base,
+    Button,
+    Slider,
+    Label,
+    Checkbox,
+    Rectangle,
+    Panel,
+    Line
+  };
 
   class Element : public std::enable_shared_from_this<Element>
   {
@@ -23,8 +34,7 @@ namespace LumidiGui
     std::unordered_map<std::string, std::shared_ptr<Collider>> colliders_; // collider UI elements
     std::vector<std::shared_ptr<Events::UIBehavior>> behaviors_;           // behaviors for UI elements
     std::vector<std::shared_ptr<Element>> children_;                       // Children UI elements
-    FluentAPI::FluentHandlerUIElements<Element> ToFluent();
-    FluentAPI::FluentHandlerUIElements<Element> SetName(const std::string &name);
+    Element &SetName(const std::string &name);
 
   protected:
     void DrawChildren() const;
@@ -42,6 +52,7 @@ namespace LumidiGui
     std::weak_ptr<Element> parent;
     virtual void Update(InputManager &inputManager); // Function to update the UI element, can be overridden in derived classes
     virtual void Render();
+    virtual ElementType GetType() const = 0;
 
     template <DerivedFromCollider ColliderType, typename... Args>
     void AddCollider(std::string label, Args &&...args)
@@ -57,12 +68,14 @@ namespace LumidiGui
     }
 
     std::shared_ptr<Collider> GetCollider(const std::string &label) const;
-    FluentAPI::FluentHandlerUIElements<Element> RenameCollider(const std::string &oldLabel, const std::string &newLabel);
+    std::unordered_map<std::string, std::shared_ptr<Collider>> &GetColliders();
+    Element &RenameCollider(const std::string &oldLabel, const std::string &newLabel);
 
     template <DerivedFromUIBehavior BehaviorType, typename... Args>
-    void AddBehavior(Args &&...args)
+    Element &AddBehavior(Args &&...args)
     {
       behaviors_.push_back(std::make_shared<BehaviorType>(weak_from_this(), std::forward<Args>(args)...));
+      return *this;
     }
 
     bool ContainsPoint(std::string label, Vector2 point) const;
@@ -84,32 +97,32 @@ namespace LumidiGui
       return nullptr; // Return nullptr if no behavior of the specified type is found
     }
 
-    bool RemoveChild(std::shared_ptr<Element> child);
-    bool RemoveChild(const std::string &name);
+    Element &RemoveChild(std::shared_ptr<Element> child);
+    Element &RemoveChild(const std::string &name);
 
     template <StringLikeOrSharedPointerType... Children>
-    bool RemoveChildren(Children &&...children)
+    Element &RemoveChildren(Children &&...children)
     {
       return (RemoveChild(std::forward<Children>(children)) && ...);
     }
 
-    bool AddChild(std::shared_ptr<Element> child);
+    Element &AddChild(std::shared_ptr<Element> child);
 
     template <SharedPointerType... Children>
-    bool AddChildren(Children &&...children)
+    Element &AddChildren(Children &&...children)
     {
       return (AddChild(std::forward<Children>(children)) && ...);
     }
 
     std::shared_ptr<Element> GetChildByName(const std::string &name) const;
 
-    FluentAPI::FluentHandlerUIElements<Element> ClearAllChildren();
+    Element &ClearAllChildren();
 
-    FluentAPI::FluentHandlerUIElements<Element> SetPosition(Vector3 position);
-    FluentAPI::FluentHandlerUIElements<Element> SetSize(Vector3 position);
+    Element &SetPosition(Vector3 position);
+    Element &SetSize(Vector3 position);
 
-    FluentAPI::FluentHandlerUIElements<Element> SetEnabled(bool isEnabled);
-    FluentAPI::FluentHandlerUIElements<Element> SetVisible(bool isVisible);
+    Element &SetEnabled(bool isEnabled);
+    Element &SetVisible(bool isVisible);
 
     Vector3 GetSize() const;
     Vector3 GetPosition() const;

@@ -16,8 +16,10 @@ namespace LumidiGui
         : Element2D(name, position, size) { this->isVertical = isVertical; }
     ~Slider() = default;
     void Draw() const override;
+    ElementType GetType() const override { return ElementType::Slider; }
 
     bool isVertical = false;
+
     std::weak_ptr<Rectangle> thumb;
     std::weak_ptr<Line> line;
   };

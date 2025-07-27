@@ -14,6 +14,7 @@ namespace LumidiGui
         : Element2D(name, position, size), text(text), fontSize(fontSize), foregroundColor(color) {}
     ~Label();
     void Draw() const override;
+    ElementType GetType() const override { return ElementType::Label; }
     std::string text;
     Color foregroundColor = BLACK;
     Color backgroundColor;

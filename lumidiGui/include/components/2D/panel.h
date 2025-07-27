@@ -16,6 +16,7 @@ namespace LumidiGui
     Panel(std::string name, Vector3 position, Vector3 size) : Element2D(name, position, size) {};
     ~Panel() = default;
     void Draw() const override;
+    ElementType GetType() const override { return ElementType::Panel; }
 
     Color backgroundColor = WHITE;
   };
