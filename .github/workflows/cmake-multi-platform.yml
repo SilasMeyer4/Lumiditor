@@ -1,0 +1,37 @@
+name: CMake build on Windows with raylib via vcpkg
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        build_type: [Release]
+        c_compiler: [cl]
+        cpp_compiler: [cl]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install vcpkg
+      run: |
+        git clone https://github.com/microsoft/vcpkg.git
+        .\vcpkg\bootstrap-vcpkg.bat
+
+    - name: Install dependencies via vcpkg manifest
+      run: .\vcpkg\vcpkg.exe install
+
+    - name: Configure CMake
+      run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+
+    - name: Build
+      run: cmake --build build --config ${{ matrix.build_type }}
+
+    - name: Test
+      run: ctest --test-dir build --build-config ${{ matrix.build_type }}
