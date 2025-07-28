@@ -12,28 +12,56 @@ int main(int, char **)
     SetTargetFPS(60);
 
     LumidiGui::UIManager uiManager;
+    const std::string btnLoad = "btnLoad";
+    const std::string btnExit = "btnExit";
+    const std::string btnOptions = "btnOptions";
+    const std::string lblTitle = "lblTitle";
 
-    uiManager.CreateSceneAndSetAsActive<LumidiGui::Scene>("scene1");
+    uiManager.CreateSceneAndSetAsActive<LumidiGui::Scene>("MainMenu");
 
     // BUTTON
-    uiManager.CreateChild<LumidiGui::Button>("test", "root", Vector2{350, 400}, Vector2{100, 50}, "Click Me");
-    uiManager.GetElementByName("test").lock()->AddBehavior<LumidiGui::Events::ClickBehavior>(
+
+    uiManager.CreateChild<LumidiGui::Label>(lblTitle, "root", Vector2{100, 100}, Vector2{150, 300}, "Lumiditor", 70, BLACK);
+
+    uiManager.CreateChild<LumidiGui::Button>(btnExit, "root", Vector2{350, 500}, Vector2{100, 50}, "Exit");
+    uiManager.GetElementByName(btnExit).lock()->AddBehavior<LumidiGui::Events::ClickBehavior>(
         []()
-        { std::cout << "Button clicked!" << std::endl; });
+        { CloseWindow(); });
 
-    uiManager.GetElementByName("test").lock()->AddBehavior<LumidiGui::Events::HoverBehavior>("default", [&]()
-                                                                                             { uiManager.GetElementByNameAs<LumidiGui::Button>("test").lock()->backgroundColor = GREEN; }, [&]()
-                                                                                             { uiManager.GetElementByNameAs<LumidiGui::Button>("test").lock()->backgroundColor = DARKGRAY; });
+    uiManager.GetElementByName("btnExit").lock()->AddBehavior<LumidiGui::Events::HoverBehavior>("default", [&]()
+                                                                                                { uiManager.GetElementByNameAs<LumidiGui::Button>(btnExit).lock()->backgroundColor = GREEN; }, [&]()
+                                                                                                { uiManager.GetElementByNameAs<LumidiGui::Button>(btnExit).lock()->backgroundColor = DARKGRAY; });
 
-    uiManager.GetElementByName("test").lock()->AddBehavior<LumidiGui::Events::DragBehavior>("default");
+    uiManager.CreateChild<LumidiGui::Button>(btnLoad, "root", Vector2{350, 100}, Vector2{100, 50}, "Load");
+    uiManager.GetElementByName(btnLoad).lock()->AddBehavior<LumidiGui::Events::ClickBehavior>(
+        []()
+        { std::cout << "loading" << std::endl; });
 
-    uiManager.CreateChild<LumidiGui::Label>("label", "root", Vector2{500, 500}, Vector2{150, 300}, "Label Wuu", 15, BLACK);
+    uiManager.GetElementByName(btnLoad).lock()->AddBehavior<LumidiGui::Events::HoverBehavior>("default", [&]()
+                                                                                              { uiManager.GetElementByNameAs<LumidiGui::Button>(btnLoad).lock()->backgroundColor = GREEN; }, [&]()
+                                                                                              { uiManager.GetElementByNameAs<LumidiGui::Button>(btnLoad).lock()->backgroundColor = DARKGRAY; });
 
-    uiManager.GetElementByName("label").lock()->AddBehavior<LumidiGui::Events::DragBehavior>("default");
+    uiManager.CreateChild<LumidiGui::Button>(btnOptions, "root", Vector2{350, 300}, Vector2{100, 50}, "Options");
+    uiManager.GetElementByName(btnOptions).lock()->AddBehavior<LumidiGui::Events::ClickBehavior>([&]()
+                                                                                                 { uiManager.SetScene("Options"); });
 
-    uiManager.GetElementByName("label").lock()->AddCollider<LumidiGui::RectangleCollider>("default");
+    uiManager.GetElementByName(btnOptions).lock()->AddBehavior<LumidiGui::Events::HoverBehavior>("default", [&]()
+                                                                                                 { uiManager.GetElementByNameAs<LumidiGui::Button>(btnOptions).lock()->backgroundColor = GREEN; }, [&]()
+                                                                                                 { uiManager.GetElementByNameAs<LumidiGui::Button>(btnOptions).lock()->backgroundColor = DARKGRAY; });
+
+    uiManager.CreateSceneAndSetAsActive<LumidiGui::Scene>("Options");
+
+    uiManager.CreateChild<LumidiGui::Button>(btnExit, "root", Vector2{350, 400}, Vector2{100, 50}, "Back");
+
+    uiManager.GetElementByName(btnExit).lock()->AddBehavior<LumidiGui::Events::ClickBehavior>([&]()
+                                                                                              { uiManager.SetScene("MainMenu"); });
 
     uiManager.CreateChild<LumidiGui::Checkbox>("checkbox", "root", Vector2{100, 100}, Vector2{30, 30}, true);
+    const std::string lblStatus = "lblStatus";
+
+    uiManager.CreateChild<LumidiGui::Label>(lblStatus, "root", Vector2{200, 100}, Vector2{100, 50}, "Back", 40, BLACK);
+    uiManager.GetElementByName("checkbox").lock()->AddBehavior<LumidiGui::Events::ClickBehavior>([&]()
+                                                                                                 { (uiManager.GetElementByNameAs<LumidiGui::Checkbox>("checkbox").lock()->isChecked) ? uiManager.GetElementByNameAs<LumidiGui::Label>(lblStatus).lock()->text = "Checked" : uiManager.GetElementByNameAs<LumidiGui::Label>(lblStatus).lock()->text = "Not Checked"; });
 
     while (!WindowShouldClose())
     {

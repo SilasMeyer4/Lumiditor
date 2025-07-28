@@ -117,6 +117,12 @@ namespace LumidiGui
       return element;
     }
 
+    UIManager &SetScene(const std::string &label)
+    {
+      activeScene_ = GetScene(label);
+      return *this;
+    }
+
     bool ChangeElementName(const std::string &oldName, const std::string &newName, const std::string &sceneName);
     bool ChangeElementName(const std::string &oldName, const std::string &newName);
 
