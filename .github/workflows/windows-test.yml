@@ -41,10 +41,10 @@ jobs:
           $output = ctest --test-dir build --build-config ${{ matrix.build_type }} --output-on-failure
           $exitCode = $LASTEXITCODE
 
-          # Speichere Output in Datei
+          # output in file
           $output | Out-File -FilePath test_output.txt -Encoding utf8
 
-          # Gib exit_code als Output aus (numerisch)
+          # exit code as output
           echo "exit_code=$exitCode" >> $env:GITHUB_OUTPUT
         shell: pwsh
 
@@ -87,10 +87,10 @@ jobs:
       - name: Send Discord notification
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_TESTS }}
-          STATUS: ${{ needs.build-windows.outputs.test_exit_code }}
           PREVIEW: ${{ steps.read-output.outputs.preview }}
           ERRORS: ${{ steps.read-output.outputs.errors }}
         run: |
+          STATUS="${{ needs.build-windows.outputs.test_exit_code }}"
           if [ "$STATUS" = "0" ]; then
             COLOR=3066993
             TITLE="✅ Tests Passed"
