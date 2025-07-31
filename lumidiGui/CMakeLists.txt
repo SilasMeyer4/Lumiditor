@@ -48,7 +48,7 @@ target_link_libraries(lumidiGui PRIVATE  pugixml::pugixml)
 # ========================
 # TESTS
 # ========================
-option(BUILD_TESTS "Build tests" OFF)
+option(BUILD_TESTS "Build tests" ON)
 if(BUILD_TESTS)
     include(FetchContent)
     enable_testing()

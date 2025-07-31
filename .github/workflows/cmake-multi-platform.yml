@@ -1,10 +1,10 @@
-name: CMake build on Windows with raylib via vcpkg
+name: Windows Build and Test
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build-windows:
@@ -17,21 +17,35 @@ jobs:
         cpp_compiler: [cl]
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Install vcpkg
-      run: |
-        git clone https://github.com/microsoft/vcpkg.git
-        .\vcpkg\bootstrap-vcpkg.bat
+      - name: Install vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          .\vcpkg\bootstrap-vcpkg.bat
 
-    - name: Install dependencies via vcpkg manifest
-      run: .\vcpkg\vcpkg.exe install
+      - name: Install dependencies via vcpkg manifest
+        run: .\vcpkg\vcpkg.exe install
 
-    - name: Configure CMake
-      run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+      - name: Configure CMake
+        run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
 
-    - name: Build
-      run: cmake --build build --config ${{ matrix.build_type }}
+      - name: Build
+        run: cmake --build build --config ${{ matrix.build_type }}
 
-    - name: Test
-      run: ctest --test-dir build --build-config ${{ matrix.build_type }}
+      - name: Run Tests and Save Output
+        id: run-tests
+        run: |
+          $ErrorActionPreference = "Continue"
+          $output = ctest --test-dir build --build-config ${{ matrix.build_type }} --output-on-failure
+          $exitCode = $LASTEXITCODE
+
+          echo $output > test_output.txt
+          echo "exit_code=$exitCode" >> $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Upload test output artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: test_output.txt

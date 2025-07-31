@@ -10,11 +10,10 @@ if(MSVC)
   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
 endif()
 
-enable_testing()
 
 # Adding LumidiGui as a subdirectory
 add_subdirectory(lumidiGui)
-
+enable_testing()
 
 # Lumidieditor
 file(GLOB_RECURSE SRC_FILES "src/*.cpp")
