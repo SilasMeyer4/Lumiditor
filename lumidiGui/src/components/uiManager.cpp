@@ -4,6 +4,18 @@
 
 namespace LumidiGui
 {
+  void UIManager::ChangeWindowSize(int newWindowWidth, int newWindowHeight)
+  {
+    SetWindowSize(newWindowWidth, newWindowHeight);
+
+    if (auto scene = activeScene_.lock())
+    {
+      if (auto root = scene->GetRootElement().lock())
+      {
+        root->UpdateLayout(newWindowWidth, newWindowHeight);
+      }
+    }
+  }
 
   void UIManager::Update(InputManager &inputManager)
   {
@@ -123,5 +135,33 @@ namespace LumidiGui
 
     auto it = scene->GetElementsMap().find(name);
     return (it != scene->GetElementsMap().end()) ? it->second : std::weak_ptr<Element>{};
+  }
+  void UIManager::SaveActiveScene()
+  {
+    if (auto scene = activeScene_.lock())
+    {
+      try
+      {
+        serializer_->SerializeScene(*scene);
+      }
+      catch (const std::exception &e)
+      {
+        std::cerr << e.what() << '\n';
+      }
+    }
+  }
+  void UIManager::SaveAllScenes()
+  {
+    for (const auto &scene : scenes_)
+    {
+      try
+      {
+        serializer_->SerializeScene(*scene.second);
+      }
+      catch (const std::exception &e)
+      {
+        std::cerr << e.what() << '\n';
+      }
+    }
   }
 }

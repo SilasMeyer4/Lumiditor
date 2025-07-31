@@ -13,7 +13,7 @@ namespace LumidiGui
   {
   private:
   public:
-    Panel(std::string name, Vector3 position, Vector3 size) : Element2D(name, position, size) {};
+    Panel(std::string name, Vector2 position, Vector2 size) : Element2D(name, position, size) {};
     ~Panel() = default;
     void Draw() const override;
     ElementType GetType() const override { return ElementType::Panel; }

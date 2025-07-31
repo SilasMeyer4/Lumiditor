@@ -6,6 +6,7 @@
 #include "uiBehavior.h"
 #include "concepts.h"
 #include "inputManager.h"
+#include "anchors.h"
 
 #include <functional>
 #include <memory>
@@ -43,10 +44,14 @@ namespace LumidiGui
     bool isVisible_ = true;
     bool isEnabled_ = true;
     std::string name_;
+    bool offsetWasCalulcated = false;
 
   public:
     Element(std::string name, Vector3 position, Vector3 size);
     ~Element() = default;
+
+    Anchors anchors;
+    Offsets offsets;
 
     virtual void Draw() const; // Function to draw the UI element, can be overriden in derived classes
     std::weak_ptr<Element> parent;
@@ -114,18 +119,22 @@ namespace LumidiGui
       return (AddChild(std::forward<Children>(children)) && ...);
     }
 
+    void UpdateLayout(int newWindowWidth, int newWindowHeight);
+    void CalculateOffsets();
+
     std::shared_ptr<Element> GetChildByName(const std::string &name) const;
 
     Element &ClearAllChildren();
 
     Element &SetPosition(Vector3 position);
-    Element &SetSize(Vector3 position);
+    Element &SetSize(Vector3 size);
 
     Element &SetEnabled(bool isEnabled);
     Element &SetVisible(bool isVisible);
 
     Vector3 GetSize() const;
-    Vector3 GetPosition() const;
+    Vector3 GetRelativePosition() const;
+    Vector3 GetAbsolutePosition() const;
     std::string GetName() const;
     bool IsVisible() const;
     bool IsEnabled() const;

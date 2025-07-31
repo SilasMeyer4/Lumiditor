@@ -5,7 +5,7 @@
 LumidiGui::Scene::Scene(std::string name, std::string rootName)
 {
   this->name = name;
-  rootElement_ = std::make_shared<Panel>(rootName, Vector3{0, 0, 0}, Vector3{(float)GetScreenWidth(), (float)GetScreenHeight()});
+  rootElement_ = std::make_shared<Panel>(rootName, Vector2{0, 0}, Vector2{(float)GetScreenWidth(), (float)GetScreenHeight()});
   elementMap_[rootName] = rootElement_;
 }
 

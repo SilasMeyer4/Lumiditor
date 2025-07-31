@@ -5,6 +5,9 @@
 #include "uiColliders.h"
 #include "inputManager.h"
 #include "scene.h"
+#include "serializer.h"
+#include <memory>
+#include "xmlSerializer.h"
 
 int main(int, char **)
 {
@@ -28,14 +31,16 @@ int main(int, char **)
         []()
         { CloseWindow(); });
 
+    uiManager.GetElementByName(btnExit).lock()->anchors.right = true;
+
     uiManager.GetElementByName("btnExit").lock()->AddBehavior<LumidiGui::Events::HoverBehavior>("default", [&]()
                                                                                                 { uiManager.GetElementByNameAs<LumidiGui::Button>(btnExit).lock()->backgroundColor = GREEN; }, [&]()
                                                                                                 { uiManager.GetElementByNameAs<LumidiGui::Button>(btnExit).lock()->backgroundColor = DARKGRAY; });
 
     uiManager.CreateChild<LumidiGui::Button>(btnLoad, "root", Vector2{350, 100}, Vector2{100, 50}, "Load");
     uiManager.GetElementByName(btnLoad).lock()->AddBehavior<LumidiGui::Events::ClickBehavior>(
-        []()
-        { std::cout << "loading" << std::endl; });
+        [&]()
+        { uiManager.ChangeWindowSize(1920, 1080); });
 
     uiManager.GetElementByName(btnLoad).lock()->AddBehavior<LumidiGui::Events::HoverBehavior>("default", [&]()
                                                                                               { uiManager.GetElementByNameAs<LumidiGui::Button>(btnLoad).lock()->backgroundColor = GREEN; }, [&]()
@@ -56,12 +61,26 @@ int main(int, char **)
     uiManager.GetElementByName(btnExit).lock()->AddBehavior<LumidiGui::Events::ClickBehavior>([&]()
                                                                                               { uiManager.SetScene("MainMenu"); });
 
+    uiManager.GetElementByName(btnExit).lock()->AddBehavior<LumidiGui::Events::HoverBehavior>("default", [&]()
+                                                                                              { uiManager.GetElementByNameAs<LumidiGui::Button>(btnExit).lock()->backgroundColor = GREEN; }, [&]()
+                                                                                              { uiManager.GetElementByNameAs<LumidiGui::Button>(btnExit).lock()->backgroundColor = DARKGRAY; });
+
     uiManager.CreateChild<LumidiGui::Checkbox>("checkbox", "root", Vector2{100, 100}, Vector2{30, 30}, true);
     const std::string lblStatus = "lblStatus";
 
+    uiManager.GetElementByName(btnExit).lock()->anchors.right = true;
+    uiManager.GetElementByName(btnExit).lock()->anchors.left = false;
+
+    uiManager.GetElementByName("checkbox").lock()->anchors.right = true;
+    uiManager.GetElementByName("checkbox").lock()->anchors.left = false;
+
     uiManager.CreateChild<LumidiGui::Label>(lblStatus, "root", Vector2{200, 100}, Vector2{100, 50}, "Back", 40, BLACK);
     uiManager.GetElementByName("checkbox").lock()->AddBehavior<LumidiGui::Events::ClickBehavior>([&]()
-                                                                                                 { (uiManager.GetElementByNameAs<LumidiGui::Checkbox>("checkbox").lock()->isChecked) ? uiManager.GetElementByNameAs<LumidiGui::Label>(lblStatus).lock()->text = "Checked" : uiManager.GetElementByNameAs<LumidiGui::Label>(lblStatus).lock()->text = "Not Checked"; });
+                                                                                                 { (uiManager.GetElementByNameAs<LumidiGui::Checkbox>("checkbox").lock()->isChecked) ? uiManager.ChangeWindowSize(1920, 1080) : uiManager.ChangeWindowSize(800, 1080); });
+
+    uiManager.InitSerializer<LumidiGui::Data::XmlSerializer>();
+    uiManager.SaveActiveScene();
+    uiManager.SaveAllScenes();
 
     while (!WindowShouldClose())
     {

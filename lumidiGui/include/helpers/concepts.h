@@ -17,6 +17,11 @@ namespace LumidiGui
     class UIBehavior;
   }
 
+  namespace Data
+  {
+    class Serializer;
+  }
+
   template <typename T>
   concept StringLike = std::convertible_to<T, std::string_view>;
 
@@ -42,6 +47,9 @@ namespace LumidiGui
 
   template <typename T>
   concept DerivedFromScene = std::derived_from<T, Scene>;
+
+  template <typename T>
+  concept DerivedFromSerializer = std::derived_from<T, Data::Serializer>;
 }
 
 #endif // LUMIDIGUI_CONCEPTS_H

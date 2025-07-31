@@ -9,6 +9,7 @@
 #include "inputManager.h"
 #include "defaultBehaviors.h"
 #include "scene.h"
+#include "serializer.h"
 
 namespace LumidiGui
 {
@@ -22,6 +23,7 @@ namespace LumidiGui
   class UIManager
   {
   private:
+    std::unique_ptr<Data::Serializer> serializer_;
     std::weak_ptr<Scene> activeScene_;
     std::unordered_map<std::string, std::shared_ptr<Scene>> scenes_; // Vector to hold UI elements
     std::unordered_map<std::type_index, std::vector<std::function<void(std::shared_ptr<LumidiGui::Element>)>>> defaultBehaviorsRegistry_;
@@ -160,6 +162,8 @@ namespace LumidiGui
       return casted;
     }
 
+    void ChangeWindowSize(int newWindowWidth, int newWindowHeight);
+
     /**
      * @brief Updates all managed UI elements with the current mouse state.
      *
@@ -231,6 +235,15 @@ namespace LumidiGui
      * @brief Renders all UI elements by calling their Draw() method.
      */
     void Draw() const;
+
+    template <DerivedFromSerializer TSerializer>
+    void InitSerializer()
+    {
+      serializer_ = std::make_unique<TSerializer>();
+    }
+
+    void SaveActiveScene();
+    void SaveAllScenes();
   };
 
 }

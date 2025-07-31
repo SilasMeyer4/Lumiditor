@@ -20,6 +20,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/include/components
     ${CMAKE_CURRENT_SOURCE_DIR}/include/colors
     ${CMAKE_CURRENT_SOURCE_DIR}/include/input
     ${CMAKE_CURRENT_SOURCE_DIR}/include/shapes
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/persistence
 )
 
     find_package(Lua REQUIRED)
@@ -32,14 +33,18 @@ target_link_libraries(lumidiGui PRIVATE sol2::sol2)
 
 message(STATUS "lumidiGui source files: ${GUI_SRC}")
 
-# raylib binden
+# raylib
 find_package(raylib CONFIG REQUIRED)
 target_link_libraries(lumidiGui PUBLIC raylib)
 
-# lohman json binden
+# lohman json
 find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(lumidiGui PRIVATE nlohmann_json::nlohmann_json)
 
+# pugixml
+
+find_package(pugixml CONFIG REQUIRED)
+target_link_libraries(lumidiGui PRIVATE  pugixml::pugixml)
 # ========================
 # TESTS
 # ========================

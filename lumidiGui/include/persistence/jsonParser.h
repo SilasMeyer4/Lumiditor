@@ -2,6 +2,7 @@
 #define LUMIDIGUI_PERSISTENCE_JSONPARSER_H
 
 #include "scene.h"
+#include "serializer.h"
 #include <functional>
 #include <map>
 #include <memory>
@@ -16,19 +17,10 @@ namespace LumidiGui
     using json = nlohmann::json;
     using JsonSerializeFunction = std::function<json(const std::shared_ptr<LumidiGui::Element> &)>;
 
-    class JsonSerializer
+    class JsonSerializer : public Serializer
     {
     private:
-      std::string version_ = "0.1.0";
-      std::string format_ = "LumidiGui";
-
     public:
-      static JsonSerializer &Instance()
-      {
-        static JsonSerializer instance;
-        return instance;
-      }
-
       void SerializeScene(const std::shared_ptr<Scene> &scene, const std::string &filePath, const std::string &description = "")
       {
         auto rootElement = scene->GetRootElement().lock();
@@ -67,13 +59,13 @@ namespace LumidiGui
         j["name"] = element->GetName();
         j["type"] = element->GetType();
 
-        j["position"] = json{{"x", element->GetPosition().x}, {"y", element->GetPosition().y}, {"z", element->GetPosition().z}};
+        j["position"] = json{{"x", element->GetRelativePosition().x}, {"y", element->GetRelativePosition().y}, {"z", element->GetRelativePosition().z}};
         j["size"] = json{{"x", element->GetSize().x}, {"y", element->GetSize().y}, {"z", element->GetSize().z}};
         j["isVisible"] = element->IsVisible();
         j["isEnabled"] = element->IsEnabled();
         j["children"] = SerializeChildren(element->GetChildren());
         j["behaviors"] = SerializeBehaviors(element->GetBehaviors());
-        j["colliders"] = SerializeColliders(element->GetColliders());
+        // j["colliders"] = SerializeColliders(element->GetColliders());
         return j;
       }
 
@@ -100,8 +92,8 @@ namespace LumidiGui
       json SerializeBehavior(const std::shared_ptr<Events::UIBehavior> &behaviors)
       {
         json j;
-        j["type"] = behaviors.GetType();
-        j["enabled"] = behaviors->isEnabled();
+        //  j["type"] = behaviors.GetType();
+        //  j["enabled"] = behaviors->isEnabled();
         // TODO how to serialize the lua functions
         return j;
       }

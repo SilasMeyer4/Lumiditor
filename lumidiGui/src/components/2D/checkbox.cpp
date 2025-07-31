@@ -10,7 +10,7 @@ void LumidiGui::Checkbox::Draw() const
     rectangle_->Draw();
     if (isChecked)
     {
-      LumidiGui::Shapes::DrawCross(Vector2{position_.x, position_.y}, Vector2{size_.x, size_.y}, 2.0f, BLACK);
+      LumidiGui::Shapes::DrawCross(Vector2{GetAbsolutePosition().x, GetAbsolutePosition().y}, Vector2{size_.x, size_.y}, 2.0f, BLACK);
     }
     // Draw Cross
 

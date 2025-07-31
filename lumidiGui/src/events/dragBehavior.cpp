@@ -21,7 +21,7 @@ void LumidiGui::Events::DragBehavior::Update(InputManager &inputManager)
 
       if (auto p = parent_.lock())
       {
-        p->SetPosition(p->GetPosition() + Vector3{offset.x, offset.y, 0});
+        p->SetPosition(p->GetAbsolutePosition() + Vector3{offset.x, offset.y, 0});
         // TODO change form default to registered label
         p->GetCollider(colliderLabel_)->position += Vector3{offset.x, offset.y, 0};
       }

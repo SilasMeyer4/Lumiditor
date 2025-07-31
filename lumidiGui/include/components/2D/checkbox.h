@@ -23,7 +23,7 @@ namespace LumidiGui
         : Element2D(name, position, size)
     {
       this->AddCollider<LumidiGui::RectangleCollider>("default");
-      SetBox<LumidiGui::Rectangle>("checkbox", position, size, GRAY, Border{.isRounded = false, .width = 2.0f, .roundness = 0.0f, .segments = 0, .color = BLACK});
+      SetBox<LumidiGui::Rectangle>("checkbox", Vector2{GetAbsolutePosition().x, GetAbsolutePosition().y}, size, GRAY, Border{.isRounded = false, .width = 2.0f, .roundness = 0.0f, .segments = 0, .color = BLACK});
       std::cout << "Created Checkbox" << std::endl;
     }
 

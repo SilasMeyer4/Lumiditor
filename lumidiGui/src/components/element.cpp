@@ -1,4 +1,5 @@
 #include "element.h"
+#include "operatorOverloads.h"
 
 namespace LumidiGui
 {
@@ -149,6 +150,103 @@ namespace LumidiGui
     return *this;
   }
 
+  void Element::UpdateLayout(int newWindowWidth, int newWindowHeight)
+  {
+
+    if (auto parentPtr = parent.lock())
+    {
+      if (!this->offsetWasCalulcated)
+      {
+        CalculateOffsets();
+        offsetWasCalulcated = true;
+      }
+
+      Vector3 parentSize = parentPtr->GetSize();
+
+      // Aktuelle Position und Größe vor Update
+      Vector3 newPos = position_;
+      Vector3 newSize = size_;
+
+      // Horizontal
+      if (anchors.left && anchors.right)
+      {
+        // Beide Seiten verankert -> Position links fix, Größe anpassen
+        newPos.x = offsets.left;
+        newSize.x = parentSize.x - offsets.left - offsets.right;
+      }
+      else if (anchors.left)
+      {
+        // Nur links verankert -> Position fix, Größe bleibt
+        newPos.x = offsets.left;
+      }
+      else if (anchors.right)
+      {
+        // Nur rechts verankert -> Position verschieben, Größe bleibt
+        newPos.x = parentSize.x - offsets.right - newSize.x;
+      }
+      // sonst keine horizontale Verankerung -> Position + Größe unverändert
+
+      // Vertikal (analog)
+      if (anchors.top && anchors.bottom)
+      {
+        newPos.y = offsets.top;
+        newSize.y = parentSize.y - offsets.top - offsets.bottom;
+      }
+      else if (anchors.top)
+      {
+        newPos.y = offsets.top;
+      }
+      else if (anchors.bottom)
+      {
+        newPos.y = parentSize.y - offsets.bottom - newSize.y;
+      }
+
+      // Z-Koordinate lässt du unverändert, wenn du nur 2D-Layout machen willst
+      newPos.z = position_.z;
+
+      // Update der Position und Größe
+      SetPosition(newPos);
+      SetSize(newSize);
+    }
+    else
+    {
+      this->SetPosition(Vector3{0, 0, position_.z});
+      this->SetSize(Vector3{(float)newWindowWidth, (float)newWindowHeight, size_.z});
+    }
+    std::cout << "Element " << this->name_ << " updated with new position: " << this->position_.x << " " << this->position_.y << std::endl;
+    // Update auch die Kinder, damit sie neu layouten
+    for (auto &child : children_)
+    {
+      child->UpdateLayout(newWindowWidth, newWindowHeight);
+    }
+  }
+  void Element::CalculateOffsets()
+  {
+    if (auto parentPtr = parent.lock())
+    {
+      Vector3 parentSize = parentPtr->GetSize();
+
+      float absPosX = this->GetAbsolutePosition().x;
+      float absPosY = this->GetAbsolutePosition().y;
+      float parentAbsX = parentPtr->GetAbsolutePosition().x;
+      float parentAbsY = parentPtr->GetAbsolutePosition().y;
+
+      offsets.left = absPosX - parentAbsX;
+      offsets.right = parentSize.x - offsets.left - GetSize().x;
+
+      offsets.top = absPosY - parentAbsY;
+      offsets.bottom = parentSize.y - offsets.top - GetSize().y;
+    }
+    else
+    {
+      offsets.left = GetRelativePosition().x;
+      offsets.right = 0.f;
+
+      offsets.top = GetRelativePosition().y;
+      offsets.bottom = 0.f;
+    }
+  }
+
   std::shared_ptr<Element> Element::GetChildByName(const std::string &name) const
   {
     for (const auto &child : children_)
@@ -193,12 +291,18 @@ namespace LumidiGui
   }
   Element &Element::SetPosition(Vector3 position)
   {
+    Vector3 delta = position - position_;
     this->position_ = position;
+    for (auto it : colliders_)
+    {
+      auto collider = it.second;
+      collider->position += (delta);
+    }
     return *this;
   }
-  Element &Element::SetSize(Vector3 position)
+  Element &Element::SetSize(Vector3 size)
   {
-    this->position_ = position;
+    this->size_ = size;
     return *this;
   }
 
@@ -222,9 +326,23 @@ namespace LumidiGui
     return this->size_;
   }
 
-  Vector3 Element::GetPosition() const
+  Vector3 Element::GetRelativePosition() const
   {
     return this->position_;
+  }
+
+  Vector3 Element::GetAbsolutePosition() const
+  {
+    Vector3 pos = this->position_;
+    std::shared_ptr<Element> currentParent = this->parent.lock();
+
+    while (currentParent)
+    {
+      pos += currentParent->position_;
+      currentParent = currentParent->parent.lock();
+    }
+
+    return pos;
   }
   std::string Element::GetName() const
   {

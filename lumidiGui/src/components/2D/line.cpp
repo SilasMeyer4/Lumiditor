@@ -2,6 +2,6 @@
 
 void LumidiGui::Line::Draw() const
 {
-  DrawLineEx(Vector2{position_.x, position_.y}, Vector2{endPosition_.x, endPosition_.y}, 2, BLACK);
+  DrawLineEx(Vector2{GetAbsolutePosition().x, GetAbsolutePosition().y}, Vector2{GetAbsolutePosition().x, GetAbsolutePosition().y}, 2, BLACK);
   DrawChildren();
 }
