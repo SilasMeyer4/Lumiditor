@@ -54,7 +54,7 @@ jobs:
           name: test-results
           path: test_output.txt
 
-  notify:
+   notify:
     runs-on: ubuntu-latest
     needs: build-windows
     steps:
@@ -70,7 +70,6 @@ jobs:
           FULL_OUTPUT=$(cat ./test_results/test_output.txt)
 
           PREVIEW=$(echo "$FULL_OUTPUT" | head -n 100)
-
           ERRORS=$(echo "$FULL_OUTPUT" | grep -iE 'error|fail' | head -n 10 || true)
 
           PREVIEW_ESCAPED=$(echo "$PREVIEW" | sed 's/`/\\`/g; s/"/\\"/g')
@@ -87,10 +86,10 @@ jobs:
       - name: Send Discord notification
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_TESTS }}
+          STATUS: ${{ needs.build-windows.outputs.test_exit_code }}
           PREVIEW: ${{ steps.read-output.outputs.preview }}
           ERRORS: ${{ steps.read-output.outputs.errors }}
         run: |
-          STATUS="${{ needs.build-windows.outputs.test_exit_code }}"
           if [ "$STATUS" = "0" ]; then
             COLOR=3066993
             TITLE="✅ Tests Passed"
@@ -104,4 +103,4 @@ jobs:
           PAYLOAD=$(jq -n --arg title "$TITLE" --arg desc "$DESCRIPTION" --argjson color $COLOR \
             '{embeds: [{title: $title, description: $desc, color: $color}]}')
 
-          curl -H "Content-Type: application/json" -X POST -d "$PAYLOAD" $DISCORD_WEBHOOK
+          curl -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$DISCORD_WEBHOOK"
