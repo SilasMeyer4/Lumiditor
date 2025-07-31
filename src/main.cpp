@@ -14,6 +14,9 @@ int main(int, char **)
     InitWindow(800, 600, "Lumiditor Level Editor");
     SetTargetFPS(60);
 
+    Image icon = LoadImage("ressources/Lumiditor32x32Transparent.png");
+    SetWindowIcon(icon);
+
     LumidiGui::UIManager uiManager;
     const std::string btnLoad = "btnLoad";
     const std::string btnExit = "btnExit";

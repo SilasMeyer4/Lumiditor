@@ -94,11 +94,11 @@ jobs:
           if [ "$STATUS" = "0" ]; then
             COLOR=3066993
             TITLE="✅ Tests Passed"
-            DESCRIPTION="Tests ran successfully.\n\nPreview of output:\n\`\`\`\n$PREVIEW\n\`\`\`"
+            DESCRIPTION=$(printf "Tests ran successfully.\n\nPreview of output:\n\`\`\`\n%s\n\`\`\`" "$PREVIEW")
           else
             COLOR=15158332
             TITLE="❌ Tests Failed"
-            DESCRIPTION="Some tests failed.\n\nError output (first 10 error lines):\n\`\`\`\n$ERRORS\n\`\`\`\n\nFull output preview:\n\`\`\`\n$PREVIEW\n\`\`\`"
+            DESCRIPTION=$(printf "Some tests failed.\n\nError output (first 10 error lines):\n\`\`\`\n%s\n\`\`\`\n\nFull output preview:\n\`\`\`\n%s\n\`\`\`" "$ERRORS" "$PREVIEW")
           fi
 
           PAYLOAD=$(jq -n \
