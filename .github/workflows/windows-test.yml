@@ -94,17 +94,17 @@ jobs:
           if [ "$STATUS" = "0" ]; then
             COLOR=3066993
             TITLE="✅ Tests Passed"
-            DESCRIPTION="Tests ran successfully.\n\nPreview of output:\n```\n$PREVIEW\n```"
+            DESCRIPTION="Tests ran successfully.\n\nPreview of output:\n\`\`\`\n$PREVIEW\n\`\`\`"
           else
             COLOR=15158332
             TITLE="❌ Tests Failed"
-            DESCRIPTION="Some tests failed.\n\nError output (first 10 error lines):\n```\n$ERRORS\n```\n\nFull output preview:\n```\n$PREVIEW\n```"
+            DESCRIPTION="Some tests failed.\n\nError output (first 10 error lines):\n\`\`\`\n$ERRORS\n\`\`\`\n\nFull output preview:\n\`\`\`\n$PREVIEW\n\`\`\`"
           fi
 
           PAYLOAD=$(jq -n \
             --arg title "$TITLE" \
             --arg desc "$DESCRIPTION" \
-            --argjson color "$COLOR" \
+            --argjson color $COLOR \
             '{embeds: [{title: $title, description: $desc, color: $color}]}')
 
           curl -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$DISCORD_WEBHOOK"
