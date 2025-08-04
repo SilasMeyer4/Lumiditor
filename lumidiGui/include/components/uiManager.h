@@ -10,15 +10,33 @@
 #include "defaultBehaviors.h"
 #include "scene.h"
 #include "serializer.h"
+#include <shared_mutex>
 
 namespace LumidiGui
 {
-
   /**
-   * @brief Manages a collection of 2D UI elements.
+   * @class UIManager
+   * @brief Manages UI scenes and elements, providing creation, retrieval, update, and removal functionalities.
    *
-   * Handles drawing, updating, and organizing UI elements,
-   * including optional name-based indexing for efficient access.
+   * The UIManager class is responsible for handling multiple UI scenes and their elements.
+   * It supports creation and management of scenes and UI elements, including parent-child relationships,
+   * default behaviors, serialization, and rendering. It also provides utility functions for changing
+   * element names, moving elements between parents, and handling window resizing.
+   *
+   * @note This class uses templates to support type-safe creation and retrieval of scenes and elements.
+   *
+   * @section Usage
+   * - Use CreateScene or CreateSceneAndSetAsActive to create new scenes.
+   * - Use CreateChild to add UI elements as children to existing elements.
+   * - Use GetElementByName or GetElementByNameAs to retrieve elements.
+   * - Use RemoveElement or RemoveElements to remove elements.
+   * - Use MoveChildToParent to reparent elements.
+   * - Use Draw to render all UI elements.
+   * - Use Update to update all managed UI elements.
+   * - Use InitSerializer to initialize the serializer for saving/loading scenes.
+   * - Use SaveActiveScene and SaveAllScenes for persistence.
+   *
+   * @threadsafe No. This class is not thread-safe.
    */
   class UIManager
   {
@@ -29,8 +47,10 @@ namespace LumidiGui
     std::unordered_map<std::type_index, std::vector<std::function<void(std::shared_ptr<LumidiGui::Element>)>>> defaultBehaviorsRegistry_;
     // std::unordered_map<std::type_index, std::vector<std::function<void(std::shared_ptr<LumidiGui::Element>)>>> defaultCollidersRegistry_;
     bool RemoveElement(std::shared_ptr<Element> element);
+    std::shared_mutex sharedMutex; // TODO making it threadsafe?
 
-    std::shared_ptr<Scene> GetScene(const std::string &sceneName) const;
+    std::shared_ptr<Scene>
+    GetScene(const std::string &sceneName) const;
 
     template <DerivedFromUIElement ElementT>
     void AddDefaultBehaviors(std::shared_ptr<ElementT> element)
