@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 file(GLOB_RECURSE GUI_SRC "src/*.cpp")
 add_library(lumidiGui STATIC ${GUI_SRC})
 
+
 # Header-Verzeichnisse (öffentlich, damit Tests sie auch sehen)
 target_include_directories(lumidiGui PUBLIC
 ${CMAKE_CURRENT_SOURCE_DIR}/include/components
@@ -21,6 +22,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/include/components
     ${CMAKE_CURRENT_SOURCE_DIR}/include/input
     ${CMAKE_CURRENT_SOURCE_DIR}/include/shapes
     ${CMAKE_CURRENT_SOURCE_DIR}/include/persistence
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/windows
 )
 
     find_package(Lua REQUIRED)
@@ -40,6 +42,9 @@ target_link_libraries(lumidiGui PUBLIC raylib)
 # lohman json
 find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(lumidiGui PRIVATE nlohmann_json::nlohmann_json)
+
+# ========================
+target_link_libraries(lumidiGui PRIVATE externalWindowLauncher)
 
 # pugixml
 

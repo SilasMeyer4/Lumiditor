@@ -13,6 +13,9 @@ endif()
 
 # Adding LumidiGui as a subdirectory
 add_subdirectory(lumidiGui)
+add_subdirectory(externalWindowLauncher)
+add_subdirectory(externalWindows)
+
 enable_testing()
 
 # Lumidieditor

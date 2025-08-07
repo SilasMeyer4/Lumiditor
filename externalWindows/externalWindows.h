@@ -1,0 +1,6 @@
+#ifndef LUMIDI_GUI_EXTERNAL_WINDOWS_H
+#define LUMIDI_GUI_EXTERNAL_WINDOWS_H
+
+#include "dialog.h"
+
+#endif // LUMIDI_GUI_EXTERNAL_WINDOWS_H

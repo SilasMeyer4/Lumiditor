@@ -8,6 +8,7 @@
 #include "serializer.h"
 #include <memory>
 #include "xmlSerializer.h"
+#include "windowCreator.h"
 
 int main(int, char **)
 {
@@ -43,7 +44,7 @@ int main(int, char **)
     uiManager.CreateChild<LumidiGui::Button>(btnLoad, "root", Vector2{350, 100}, Vector2{100, 50}, "Load");
     uiManager.GetElementByName(btnLoad).lock()->AddBehavior<LumidiGui::Events::ClickBehavior>(
         [&]()
-        { uiManager.ChangeWindowSize(1920, 1080); });
+        { LumidiGui::CreateExternalWindow("Lumiditor", 200, 200, {100, 100}); });
 
     uiManager.GetElementByName(btnLoad).lock()->AddBehavior<LumidiGui::Events::HoverBehavior>("default", [&]()
                                                                                               { uiManager.GetElementByNameAs<LumidiGui::Button>(btnLoad).lock()->backgroundColor = GREEN; }, [&]()
@@ -60,6 +61,8 @@ int main(int, char **)
     uiManager.CreateSceneAndSetAsActive<LumidiGui::Scene>("Options");
 
     uiManager.CreateChild<LumidiGui::Button>(btnExit, "root", Vector2{350, 400}, Vector2{100, 50}, "Back");
+
+    std::cout << "Button Size" << uiManager.GetElementByName(btnExit).lock()->GetSize().x << " " << uiManager.GetElementByName(btnExit).lock()->GetSize().y << std::endl;
 
     uiManager.GetElementByName(btnExit).lock()->AddBehavior<LumidiGui::Events::ClickBehavior>([&]()
                                                                                               { uiManager.SetScene("MainMenu"); });

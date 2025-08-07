@@ -213,7 +213,7 @@ namespace LumidiGui
       this->SetPosition(Vector3{0, 0, position_.z});
       this->SetSize(Vector3{(float)newWindowWidth, (float)newWindowHeight, size_.z});
     }
-    std::cout << "Element " << this->name_ << " updated with new position: " << this->position_.x << " " << this->position_.y << std::endl;
+    std::cout << "Element " << this->name_ << " updated with new size: " << this->size_.x << " " << this->size_.y << std::endl;
     // Update auch die Kinder, damit sie neu layouten
     for (auto &child : children_)
     {
